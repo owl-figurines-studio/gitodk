@@ -1,7 +1,7 @@
 import os
 
 from odk import fastdfs_client
-from odk.utils.Returns import ret_upload_data
+from odk.utils.Returns import ret_data
 
 def save_Image(file):
     '''
@@ -24,5 +24,5 @@ def save_Image(file):
         print('no such file:%s' % file.filename)  # 则返回文件不存在
     if ret['Status']=='Upload successed.':
         url = 'http://'+ret['Storage IP']+':8888/'+ret['Remote file_id']
-        return ret_upload_data(200,'请求成功',1002,url=url)
-    return ret_upload_data(200, '请求成功', 2006)
+        return ret_data(200,'请求成功',1002,url=url)
+    return ret_data(200, '请求成功', 2006)

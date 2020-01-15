@@ -6,7 +6,7 @@ from . import api
 from odk.models import User
 from odk import db,verify_rs
 from odk.libs.yuntongxun.sms import CCP
-from odk.utils.Returns import ret_data,ret_upload_data,ret_user_data
+from odk.utils.Returns import ret_data#,ret_upload_data,ret_user_data
 from odk.utils.fastdfs.Images import save_Image
 
 # @api01.route('/userinfo/<myre("\d{5}"):user_id>')
@@ -20,7 +20,7 @@ from odk.utils.fastdfs.Images import save_Image
 def verify():
     userphone = request.form.get('userphone')
     print(userphone)
-    # print(type(userphone))
+    print(type(userphone))
     if userphone is None:
         return ret_data(403, '访问被禁止', 2002)
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2001,'message':'手机号为空'}},403
@@ -53,11 +53,11 @@ def login():
         get_redis_verify=verify_rs.get(qian_userphone)
     except:
         print('前端输入错误')
-        return ret_user_data(403, '访问被禁止', 2003)
+        return ret_data(403, '访问被禁止', 2003)
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
     # 判断验证码是不是正确
     if qian_vercode!=get_redis_verify:
-        return ret_user_data(403, '访问被禁止', 2003)
+        return ret_data(403, '访问被禁止', 2003)
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
     # 从数据库中查找用户
     user_lst=User.query.filter_by(user_phone=qian_userphone).all()
@@ -72,7 +72,7 @@ def login():
         print('已有user,不操作')
     # 新建jwt,并返回个前端
     access_token = create_access_token(identity=qian_userphone)
-    ret,state = ret_user_data(200, '请求成功', 1000)
+    ret,state = ret_data(200, '请求成功', 1000)
     response = make_response(ret)
     response.headers['token'] = access_token
     response.state = state
@@ -110,7 +110,7 @@ def test_image():
         print(file)
         # if file
     except KeyError as e:
-        return ret_upload_data(200,'请求成功',2007)
+        return ret_data(200,'请求成功',2007)
     return save_Image(file)
 
 # 测试git

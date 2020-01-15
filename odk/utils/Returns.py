@@ -9,20 +9,17 @@ def base_ret_data(code,messagehttp,**kwargs):
 
 def ret_data(code,messagehttp,verifyStateCode,**kwargs):
     return base_ret_data(code, messagehttp,
-                         verifyStateCode=verifyStateCode,
-                         message=ERRORMSG[verifyStateCode],
+                         userStateCode=verifyStateCode,
                          **kwargs)
 
-def ret_user_data(code,messagehttp,userStateCode,**kwargs):
-    return base_ret_data(code, messagehttp,
-                         userStateCode=userStateCode,
-                         message=ERRORMSG[userStateCode],
-                         **kwargs)
-
-
-def ret_upload_data(code,messagehttp,uploadStateCode,**kwargs):
-    return base_ret_data(code, messagehttp,
-                         uploadStateCode=uploadStateCode,
-                         message=ERRORMSG[uploadStateCode],
-                         **kwargs)
+# def ret_user_data(code,messagehttp,userStateCode,**kwargs):
+#     return base_ret_data(code, messagehttp,
+#                          userStateCode=userStateCode,
+#                          **kwargs)
+#
+#
+# def ret_upload_data(code,messagehttp,uploadStateCode,**kwargs):
+#     return base_ret_data(code, messagehttp,
+#                          uploadStateCode=uploadStateCode,
+#                          **kwargs)
 
