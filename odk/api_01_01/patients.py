@@ -16,11 +16,11 @@ def patient():
     user = get_jwt_identity()
     print("user:",user)
 
-    with open('/home/python/Desktop/odk/patient-example.json', 'r') as h:
-        pjs = json.load(h)
-    patient = p.Patient(pjs)
-    print(patient)
-    print(patient.as_json())
+    # with open('/home/python/Desktop/odk/patient-example.json', 'r') as h:
+    #     pjs = json.load(h)
+    # patient = p.Patient(pjs)
+    # print(patient)
+    # print(patient.as_json())
 
 
     if user is None:
@@ -58,7 +58,9 @@ def patient():
             return ret_data(200,"请求成功",2008)
 
     elif request.method=='GET':
-        dict01 = mongodb.basic_information.find_one({'id':str(user)})
+        dict01 = mongodb.basic_information.find_one({'id':str(user),'active':True})
+        if dict01 is None:
+            return ret_data(200, '请求成功',2011)
         dict02 = {}
         del dict01['_id']
         dict02['city']=dict01['address'][0]['city']
@@ -68,9 +70,17 @@ def patient():
         return ret_data(200, '请求成功', 1005, **dict02)
 
     elif request.method=='DELETE':
-        mongodb.basic_information.update_one({'id': str(user)}, {'$set':{'active':False}})
-        # mongodb.basic_information.delete_one({'id':str(user)})
-        return ret_data(200, '请求成功', 1004)
+        count = 0
+        for i in patientList:
+            print(i['active'])
+            if i['active'] is True:
+                count += 1
+        if count >= 1:
+            mongodb.basic_information.update_one({'id': str(user),'active':True}, {'$set':{'active':False}})
+            # mongodb.basic_information.delete_one({'id':str(user)})
+            return ret_data(200, '请求成功', 1004)
+        else:
+            return ret_data(200, '请求成功', 2010)
 
     elif request.method=='PUT':
         count = 0
