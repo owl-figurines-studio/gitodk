@@ -4,9 +4,9 @@ import random
 
 from . import api
 from odk.models import User
-from odk import db,verify_rs
+from odk import db,verify_rs,mongodb
 from odk.libs.yuntongxun.sms import CCP
-from odk.utils.Returns import ret_data#,ret_upload_data,ret_user_data
+from odk.utils.Returns import ret_data #,ret_upload_data,ret_user_data
 from odk.utils.fastdfs.Images import save_Image
 
 # @api01.route('/userinfo/<myre("\d{5}"):user_id>')
@@ -113,4 +113,62 @@ def test_image():
         return ret_data(200,'请求成功',2007)
     return save_Image(file)
 
+
+# 微信登录
+@api.route('/user/wlogin')
+def wlogin():
+    import odk.utils.const.login_const
+    import requests  # 导入request模块
+    url = 'https://api.weixin.qq.com/sns/jscode2session'
+    response = requests.get(url)  # 用导入的request模块的get方法访问URL
+    print(response.status_code)  # 调用response里的status_code方法查看状态码
+    print(response.text)  # 调用response里的text #字符串方式的响应体，会自动根据响应头部的字符编码进行解码
+
 # 测试git
+@api.route('/user/fhir')
+def fhir():
+    import fhirclient.models.patient as p
+    import fhirclient.models.humanname as hn
+    patient = p.Patient({'id': 'patient-1'})
+    print(patient.id)
+    # prints `patient-1`
+
+    name = hn.HumanName()
+    name.given = ['Peter']
+    name.family = 'Parker'
+    patient.name = [name]
+
+
+    print(mongodb)
+
+    print(patient.as_json())
+    dict01 = patient.as_json()
+    ret = mongodb.a.insert_one(dict01)
+    print(ret)
+    ret = mongodb.a.find()
+    for i in ret:
+        print(i)
+    print('111111111111111111')
+
+    import json
+    import fhirclient.models.patient as p
+    with open('/home/python/Desktop/odk/patient-example.json', 'r') as h:
+        pjs = json.load(h)
+    patient = p.Patient(pjs)
+    dict02 = patient.as_json()
+
+    ret = mongodb.a.insert_one(dict02)
+    print(ret)
+    ret = mongodb.a.find()
+    for i in ret:
+        print(i)
+    print('2222222222222222')
+    print(patient.name[0].given)
+    print(patient.name)
+    print(patient.gender)
+    print(patient.photo)
+    print(patient.address)
+    print("-------------------------")
+    # prints patient's given name array in the first `name` property
+    return ret_data(200,'请求成功',1000)
+
