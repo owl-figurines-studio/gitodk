@@ -72,7 +72,7 @@ def login():
         print('已有user,不操作')
     # 新建jwt,并返回个前端
     access_token = create_access_token(identity=qian_userphone)
-    ret,state = ret_data(200, '请求成功', 1000)
+    ret,state = ret_data(200, '请求成功', 1007)
     response = make_response(ret)
     response.headers['token'] = access_token
     response.state = state
