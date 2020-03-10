@@ -17,6 +17,7 @@ from odk.utils.fastdfs.Images import save_Image
 # 获取手机验证
 # 前端 : POST  表单: userphone=19957892906
 # 后端 : 返回   "验证码获取成功"
+@jwt_required
 def verify():
     userphone = request.form.get('userphone')
     print(userphone)
@@ -43,6 +44,23 @@ def verify():
 
     return ret_data(200,'请求成功',1000)
     # return {'code':200,'message':'请求成功','data':{'message':'获取验证码成功','verifyStateCode':1000}},200
+
+@api.route('/user/verifyok',methods=['POST'])
+@jwt_required
+def verifyok():
+    try:# 获取手机号和验证码
+        qian_vercode=request.form['verification_code']
+        qian_userphone = request.form['userphone']
+        get_redis_verify=verify_rs.get(qian_userphone)
+    except:
+        print('前端输入错误')
+        return ret_data(403, '访问被禁止', 2003)
+        # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
+    # 判断验证码是不是正确
+    if qian_vercode!=get_redis_verify:
+        return ret_data(403, '访问被禁止', 2003)
+        # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
+    return ret_data(200,'请求成功',1001)
 
 @api.route('/user/login',methods=['POST'])
 # 用户登录
@@ -80,6 +98,31 @@ def login():
     return response
     # return {'code':200,'message':'请求成功','data':{'verifyStateCode':1001,'message':'验证通过,可登录','access_token':access_token}},200
 
+
+@api.route('/user/code2session',methods=['POST'])
+def wei_login():
+    js_code = request.form['code']
+    appid = "wxc49a36275e75991b"
+    secret = "c5d0a6c4d637728f0d602ec5d9a6c99e"
+    grant_type = "authorization_code"
+    import requests
+    data = {"js_code":js_code,"appid":appid,"secret":secret,"grant_type":grant_type}
+    response = requests.get("https://api.weixin.qq.com/sns/jscode2session", params=data)
+    print("response:",response.json())
+    ret = response.json()
+    if 'errcode' in ret:
+        return ret_data(200,'请求成功',2012,errmsg=ret['errmsg'])
+    # test = {
+    #     "session_key": "4xtv9zkCLF9eB7zQWSedgA==",
+    #     "openid": "oRVrU5PzUZ4DEIdT3qKP4wNzJlmc"
+    # }
+    access_token = create_access_token(identity=ret['openid'])
+    print("token:",access_token)
+    ret, state = ret_data(200, '请求成功', 1010)
+    response = make_response(ret)
+    response.headers['token'] = access_token
+    response.state = state
+    return response
 
 @api.route('/user/test',methods=['GET','POST','DELETE','PUT'])
 @jwt_optional

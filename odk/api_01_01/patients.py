@@ -11,7 +11,7 @@ import fhirclient.models.fhirdate as fdate
 import fhirclient.models.address as ad
 
 @api.route('/patient',methods=['GET','POST','DELETE','PUT'])
-@jwt_optional
+@jwt_required
 def patient():
     user = get_jwt_identity()
     print("user:",user)

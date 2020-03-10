@@ -35,13 +35,18 @@ from odk import models
 
 def create_app(config_name):
     app = Flask(__name__)
+    from odk.schema.schema import schema
+    from flask_graphql import GraphQLView
+    # from odk.database.base import connect
+    app.add_url_rule("/graphql", view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True))
+
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
     jwt = JWTManager(app)
 
     @jwt.expired_token_loader
     @jwt.invalid_token_loader
     def my_expired_token_callback(expired_token):
-        return ret_data(401,'身份信息有误',2005,)
+        return ret_data(401,'身份信息有误',2004,)
 
 
     app.config.from_object(config[config_name])
@@ -69,8 +74,8 @@ def create_app(config_name):
     print(app.url_map)
     print('################')
 
+
+
     admin.add_view(ModelView(models.User, db.session,name='用户'))
-
-
 
     return app
