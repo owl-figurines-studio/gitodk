@@ -151,11 +151,30 @@ def test_image():
     try:
         file = xxx['UploadImage']
         print(file)
-        # if file
     except KeyError as e:
         return ret_data(200,'请求成功',2007)
     return save_Image(file)
 
+@api.route('/user/imageBase64',methods=['POST'])
+def test_image_base64():
+    xxx = request.form['imageBase64']
+    print(xxx)
+    import base64
+    import io
+    from PIL import Image
+    img_b64decode = base64.b64decode(xxx)  # base64解码
+
+    image = io.BytesIO(img_b64decode)
+    img = Image.open(image)
+    img.show()
+
+    return ret_data(200,'请求成功',1000)
+    # try:
+    #     file = xxx['UploadImage']
+    #     print(file)
+    # except KeyError as e:
+    #     return ret_data(200,'请求成功',2007)
+    # return save_Image(file)
 
 # 微信登录
 @api.route('/user/wlogin')
