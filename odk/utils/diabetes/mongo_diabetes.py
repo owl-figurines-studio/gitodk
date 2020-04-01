@@ -1,7 +1,7 @@
 import pymongo
 import pandas as pd
 
-client = pymongo.MongoClient('127.0.0.1', 27017)
+client = pymongo.MongoClient('39.107.238.66', 27017)
 
 # 获取操作句柄
 mongodb = client.odk01

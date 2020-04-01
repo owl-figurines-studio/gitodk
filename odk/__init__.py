@@ -18,13 +18,13 @@ from fdfs_client.client import Fdfs_client
 from pymongo import MongoClient
 
 # 创建链接对象
-client = MongoClient('127.0.0.1', 27017)
+client = MongoClient('39.107.238.66', 27017)
 
 # 获取操作句柄
 mongodb = client.odk01
 pymysql.install_as_MySQLdb()
 db = SQLAlchemy()
-verify_rs = Redis(host='127.0.0.1',port=6379,db=8,decode_responses=True)
+verify_rs = Redis(host='39.107.238.66',port=6379,db=8,decode_responses=True)
 fastdfs_client = Fdfs_client('./odk/utils/fastdfs/client.conf')
 
 
