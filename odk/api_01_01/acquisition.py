@@ -6,8 +6,9 @@ from PIL import Image
 
 from . import api
 from odk.utils.fastdfs.Images import save_Image
+from odk.utils.Returns import ret_data
 
-@api.route('/acquisition/image',methods=['POST'])
+@api.route('/acquisition/imagebase64',methods=['POST'])
 def test_image_base64():
     xxx = request.form['imageBase64']
     # print(xxx)
@@ -20,4 +21,15 @@ def test_image_base64():
     img = img.convert('RGB')
     img.filename = random_str
     return save_Image(img)
+
+
+@api.route('/acquisition/image', methods=['POST'])
+def test_image():
+    xxx = request.files
+    try:
+        file = xxx['UploadImage']
+        print(file)
+    except KeyError as e:
+        return ret_data(200, '请求成功', 2007)
+    return save_Image(file)
 

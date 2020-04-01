@@ -145,15 +145,7 @@ def test_test():
 
 
 
-@api.route('/user/image',methods=['POST'])
-def test_image():
-    xxx = request.files
-    try:
-        file = xxx['UploadImage']
-        print(file)
-    except KeyError as e:
-        return ret_data(200,'请求成功',2007)
-    return save_Image(file)
+
 
 # @api.route('/user/imageBase64',methods=['POST'])
 # def test_image_base64():
