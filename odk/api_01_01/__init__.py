@@ -6,3 +6,4 @@ api = Blueprint('api',__name__)
 from . import users
 from . import patients
 from . import diabetes
+from . import acquisition
