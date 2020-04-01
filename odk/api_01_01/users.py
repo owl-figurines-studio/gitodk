@@ -165,16 +165,23 @@ def test_image_base64():
     img_b64decode = base64.b64decode(xxx)  # base64解码
 
     image = io.BytesIO(img_b64decode)
+    random_str = "%06d.jpg" % random.randint(0, 999999)
+    # image.filename = random_str
     img = Image.open(image)
-    img.show()
+    img = img.convert('RGB')
+    img.filename = random_str
+    # img.show()
+    # img.save('./odk/images/'+random_str)
 
-    return ret_data(200,'请求成功',1000)
+
+    # return ret_data(200,'请求成功',1000)
     # try:
     #     file = xxx['UploadImage']
     #     print(file)
     # except KeyError as e:
     #     return ret_data(200,'请求成功',2007)
-    # return save_Image(file)
+    # return save_Image(image)
+    return save_Image(img)
 
 # 微信登录
 @api.route('/user/wlogin')
