@@ -67,3 +67,10 @@ def rowOCR(img):
   return rowSegment(add)
 
 
+if __name__ == '__main__':
+    img = cv2.imread('/home/python/Desktop/gitodk/odk/odk/utils/ocr/mark6.jpg',0)
+    ret = rowOCR(img)
+    print(ret)
+
+
+

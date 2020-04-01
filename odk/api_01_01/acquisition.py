@@ -10,7 +10,7 @@ from odk.utils.fastdfs.Images import save_Image
 @api.route('/acquisition/image',methods=['POST'])
 def test_image_base64():
     xxx = request.form['imageBase64']
-    print(xxx)
+    # print(xxx)
 
     img_b64decode = base64.b64decode(xxx)  # base64解码
 
@@ -20,3 +20,4 @@ def test_image_base64():
     img = img.convert('RGB')
     img.filename = random_str
     return save_Image(img)
+
