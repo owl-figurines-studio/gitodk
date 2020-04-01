@@ -58,11 +58,12 @@ def rowSegment(img):
       elif rowAvg[i]>thre and abs(rowAvg[i]-rowAvg[i-1])<1 and enable == 1:
           empcount = empcount+1
   # print(rowList)
+  return rowList
 
 
 # img = cv2.imread('图片路径',0)
 def rowOCR(img):
   add = thresholding(img)
-  rowSegment(add)
+  return rowSegment(add)
 
 
