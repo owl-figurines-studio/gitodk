@@ -32,9 +32,9 @@ def thresholding(img):
 #逐行识别
 def rowSegment(img):
   (row,col)=img.shape[0:2]
-  print(row,col)
+  # print(row,col)
   thre = 245
-  rowAvg = np.floor(np.mean(add,axis=1))
+  rowAvg = np.floor(np.mean(img,axis=1))
 
   start = 0
   end = -1
@@ -47,8 +47,8 @@ def rowSegment(img):
       elif empcount >= 5 and end == -1:
           end = i
           # print(start," ",end)
-          img = image.fromarray(cv2.cvtColor(add[start:end,:], cv2.COLOR_BGR2RGB))
-          str = pytesseract.image_to_string((img), lang='chi_sim+eng')
+          subImg = image.fromarray(cv2.cvtColor(img[start:end,:], cv2.COLOR_BGR2RGB))
+          str = pytesseract.image_to_string((subImg), lang='chi_sim+eng')
           # img.show()
           rowList.append(str)
           empcount = 0
@@ -71,6 +71,3 @@ if __name__ == '__main__':
     img = cv2.imread('/home/python/Desktop/gitodk/odk/odk/utils/ocr/mark6.jpg',0)
     ret = rowOCR(img)
     print(ret)
-
-
-
