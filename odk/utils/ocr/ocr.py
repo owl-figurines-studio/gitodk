@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-import matplotlib.pylab  as plt
-import seaborn as sns
-import pandas as pd
-import math
+# import matplotlib.pylab  as plt
+# import seaborn as sns
+# import pandas as pd
+# import math
 from PIL import Image as image
 import pytesseract
 
