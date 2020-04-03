@@ -36,8 +36,8 @@ def test_image():
         return ret_data(200, '请求成功', 2007)
     return save_Image(file)
 
-@api.route('/acquisition/ocr', methods=['POST'])
-def acuisition_ocr():
+@api.route('/acquisition/uploadimage', methods=['POST'])
+def acuisition_uploadocr():
     xxx = request.files
     try:
         file = xxx['UploadImage']
@@ -48,17 +48,38 @@ def acuisition_ocr():
     path = "./odk/images/" + filename  # 文件路径
     file.save(path)
     pwd = os.getcwd()
-    print("pwd:",pwd)
-    print("path:",path)
+    # print("pwd:",pwd)
+    # print("path:",path)
 
     all_path = pwd+path[1:]
-    print(all_path)
+    # print(all_path)
+    bytes_path = all_path.encode("utf-8")
+    str_url = base64.b64encode(bytes_path)  # 被编码的参数必须是二进制数据
+    print(str_url)
+    str_url = str_url.decode("utf-8")
+    return ret_data(200,'请求成功',1012,id=str_url)
+
+@api.route('/acquisition/ocr', methods=['POST'])
+def acuisition_getocr():
+    all_path = request.form['id']
+    all_path = base64.b64decode(all_path.encode('utf-8')).decode("utf-8")
     img = cv2.imread(all_path,0)
     lst = ocr.rowOCR(img)
-    if os.path.exists(path):  # 如果文件存在
+    if os.path.exists(all_path):  # 如果文件存在
         # 删除文件，可使用以下两种方法。
-        os.remove(path)
+        os.remove(all_path)
         # os.unlink(path)
-    else:
-        print('no such file:%s' % file.filename)  # 则返回文件不存在
     return ret_data(200,'请求成功',1011,result=lst)
+
+# from odk import celery
+# @celery.task()
+# def add_together(a, b):
+#     return a + b
+#
+# @api.route('/acquisition/asyocr', methods=['POST'])
+# def acquisition_asyocr():
+#     a = request.form['a']
+#     b = request.form['b']
+#     ret = add_together.delay(a,b)
+#     print(ret)
+#     return ret_data(200,'请求成功',1000)

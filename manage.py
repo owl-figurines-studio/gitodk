@@ -2,12 +2,13 @@ from flask_script import Manager
 from flask_migrate import Migrate,MigrateCommand
 
 
-from odk import create_app,db
+from odk import create_app,db#,app
 from odk import models
 import os
 
 #创建app
 app = create_app('dev')
+
 
 manager = Manager(app)
 

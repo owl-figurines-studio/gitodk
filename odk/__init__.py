@@ -5,6 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from celery import Celery
 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -30,6 +31,23 @@ fastdfs_client = Fdfs_client('./odk/utils/fastdfs/client.conf')
 
 from odk import models
 
+# celery = Celery()
+
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
 
 
 
@@ -78,4 +96,16 @@ def create_app(config_name):
 
     admin.add_view(ModelView(models.User, db.session,name='用户'))
 
+    app.config.update(
+        CELERY_BROKER_URL='redis://localhost:6379',
+        CELERY_RESULT_BACKEND='redis://localhost:6379'
+    )
+
+
     return app
+# app = create_app('dev')
+# celery = make_celery(app)
+#
+# @celery.task()
+# def add_together(a, b):
+#     return a + b
