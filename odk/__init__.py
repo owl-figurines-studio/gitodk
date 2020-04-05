@@ -19,7 +19,7 @@ from fdfs_client.client import Fdfs_client
 from pymongo import MongoClient
 
 # 创建链接对象
-client = MongoClient('39.107.238.66', 27017)
+client = MongoClient('127.0.0.1', 27017)
 
 # 获取操作句柄
 mongodb = client.odk01

@@ -10,6 +10,7 @@ from . import api
 from odk.utils.fastdfs.Images import save_Image
 from odk.utils.Returns import ret_data
 from odk.utils.ocr import ocr
+from odk import mongodb
 
 @api.route('/acquisition/imagebase64',methods=['POST'])
 def test_image_base64():
@@ -57,19 +58,25 @@ def acuisition_uploadocr():
     str_url = base64.b64encode(bytes_path)  # 被编码的参数必须是二进制数据
     print(str_url)
     str_url = str_url.decode("utf-8")
-    return ret_data(200,'请求成功',1012,id=str_url)
+    mongodb.ocr.insert_one({"path": str_url,"result": []})
+    return ret_data(200, '请求成功', 1012, id=str_url)
+
 
 @api.route('/acquisition/ocr', methods=['POST'])
 def acuisition_getocr():
-    all_path = request.form['id']
-    all_path = base64.b64decode(all_path.encode('utf-8')).decode("utf-8")
-    img = cv2.imread(all_path,0)
-    lst = ocr.rowOCR(img)
-    if os.path.exists(all_path):  # 如果文件存在
-        # 删除文件，可使用以下两种方法。
-        os.remove(all_path)
-        # os.unlink(path)
-    return ret_data(200,'请求成功',1011,result=lst)
+    get_path = request.form['id']
+    all_path = base64.b64decode(get_path.encode('utf-8')).decode("utf-8")
+    mongo_path = mongodb.ocr.find_one({"path": get_path})
+    if mongo_path and mongo_path['result'] == []:
+        img = cv2.imread(all_path, 0)
+        lst = ocr.rowOCR(img)
+        mongodb.ocr.update_one({"path": get_path}, {"$set": {"result": lst}})
+        if os.path.exists(all_path):  # 如果文件存在
+            # 删除文件，可使用以下两种方法。
+            os.remove(all_path)
+    else:
+        lst = mongo_path['result']
+    return ret_data(200, '请求成功', 1011, result=lst)
 
 # from odk import celery
 # @celery.task()
