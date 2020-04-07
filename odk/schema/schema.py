@@ -1,8 +1,10 @@
 from odk.schema import schema_user
 from odk.schema import schema_diabetes
+from odk.schema import schema_ocr
 import graphene
 from graphene_mongo.fields import MongoengineConnectionField
 from odk.database.base import connect
+
 
 class Query(graphene.ObjectType):
 
@@ -12,12 +14,17 @@ class Query(graphene.ObjectType):
 
     diabetes = MongoengineConnectionField(schema_diabetes.DiabetesNode)
 
+    ocr = MongoengineConnectionField(schema_ocr.OcrNode)
+
+
 class Mutation(graphene.ObjectType):
     create_user = schema_user.CreateUser.Field()
     create_diabetes = schema_diabetes.CreateDiabetes.Field()
+    create_ocr = schema_ocr.CreateOcr.Field()
 
     update_user = schema_user.UpdateUser.Field()
     update_diabetes = schema_diabetes.UpdateDiabetes.Field()
+    update_ocr = schema_ocr.UpdateOcr.Field()
 
 
 

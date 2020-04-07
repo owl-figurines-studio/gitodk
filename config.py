@@ -4,12 +4,12 @@ class Config(object):
     '''
     SECRET_KEY = 'JSFJBJBFEHI,NKHOHIO'
 
-    REDIS_HOST = '39.107.238.66'
+    REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
     REDIS_DB = 8
 
     # 配置mysql
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@39.107.238.66:3306/odk'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/odk'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 配置jwt
@@ -31,7 +31,7 @@ class Config(object):
     # SQLALCHEMY_TRACK_MODIFICATIONS must be set to True when msearch auto index is enabled
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     # when backend is elasticsearch
-    ELASTICSEARCH = {"hosts": ["39.107.238.66:3306"]}
+    ELASTICSEARCH = {"hosts": ["127.0.0.1.66:3306"]}
 
 
 

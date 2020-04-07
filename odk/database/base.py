@@ -1,3 +1,3 @@
 from mongoengine import connect
 
-connect("odk01", host="39.107.238.66:27017")
+connect("odk01", host="127.0.0.1:27017")

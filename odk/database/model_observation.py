@@ -4,6 +4,7 @@
 from mongoengine import Document
 from mongoengine import (StringField, IntField,DictField)
 
+
 class ModelObservation(Document):
 
     meta = {"collection": "observation"}
