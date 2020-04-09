@@ -8,16 +8,14 @@ import os
 # 第三方
 from flask import request
 from PIL import Image
-import cv2
 
 # 自己写
 from . import api
 from odk.utils.fastdfs.Images import save_Image
 from odk.utils.Returns import ret_data
 from odk.utils.ocr.ocr import rowOCR_path
-from odk import mongodb
 from odk.utils.fastdfs.Images import save_image_url
-from odk.utils.base64 import base64_decode,base64_encode
+from odk.utils.base64 import base64_decode, base64_encode
 from odk.database.model_ocr import ModelOcr
 
 
