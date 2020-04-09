@@ -12,7 +12,8 @@ from odk.utils.Returns import ret_data
 from odk.utils.ocr import ocr
 from odk import mongodb
 
-@api.route('/acquisition/imagebase64',methods=['POST'])
+
+@api.route('/acquisition/imagebase64', methods=['POST'])
 def test_image_base64():
     xxx = request.form['imageBase64']
     # print(xxx)
@@ -37,8 +38,9 @@ def test_image():
         return ret_data(200, '请求成功', 2007)
     return save_Image(file)
 
+
 @api.route('/acquisition/uploadimage', methods=['POST'])
-def acuisition_uploadocr():
+def acquisition_upload_ocr():
     xxx = request.files
     try:
         file = xxx['UploadImage']
@@ -63,7 +65,7 @@ def acuisition_uploadocr():
 
 
 @api.route('/acquisition/ocr', methods=['POST'])
-def acuisition_getocr():
+def acquisition_getocr():
     get_path = request.form['id']
     all_path = base64.b64decode(get_path.encode('utf-8')).decode("utf-8")
     mongo_path = mongodb.ocr.find_one({"path": get_path})
@@ -71,9 +73,9 @@ def acuisition_getocr():
         img = cv2.imread(all_path, 0)
         lst = ocr.rowOCR(img)
         mongodb.ocr.update_one({"path": get_path}, {"$set": {"result": lst}})
-        if os.path.exists(all_path):  # 如果文件存在
-            # 删除文件，可使用以下两种方法。
-            os.remove(all_path)
+        # if os.path.exists(all_path):  # 如果文件存在
+        #    # 删除文件，可使用以下两种方法。
+        #     os.remove(all_path)
     else:
         lst = mongo_path['result']
     return ret_data(200, '请求成功', 1011, result=lst)
