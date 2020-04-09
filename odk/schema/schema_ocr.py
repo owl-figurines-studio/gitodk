@@ -2,7 +2,8 @@ from odk.database.model_ocr import ModelOcr
 from graphene_mongo.types import MongoengineObjectType
 import graphene
 
-import cv2, base64
+import cv2
+import base64
 import os
 
 from odk.utils.ocr.ocr import rowOCR
