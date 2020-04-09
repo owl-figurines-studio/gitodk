@@ -48,7 +48,10 @@ def acquisition_upload_ocr():
     except KeyError as e:
         return ret_data(200, '请求成功', 2007)
     filename = file.filename
-    path = "./odk/images/" + filename  # 文件路径
+    dir_path = "./odk/images/"
+    if not os.path.isdir(dir_path):
+        os.makedirs(dir_path)
+    path = dir_path + filename  # 文件路径
     file.save(path)
     pwd = os.getcwd()
     # print("pwd:",pwd)
