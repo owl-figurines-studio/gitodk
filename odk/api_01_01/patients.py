@@ -71,7 +71,7 @@ def patient():
 
     elif request.method=='DELETE':
         count = 0
-        for i in patientList:
+        for i in patient_list:
             print(i['active'])
             if i['active'] is True:
                 count += 1
@@ -84,7 +84,7 @@ def patient():
 
     elif request.method=='PUT':
         count = 0
-        for i in patientList:
+        for i in patient_list:
             print(i['active'])
             if i['active'] is True:
                 count += 1
