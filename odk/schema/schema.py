@@ -1,19 +1,17 @@
+import graphene
+from graphene_mongo.fields import MongoengineConnectionField
+
 from odk.schema import schema_user
 from odk.schema import schema_diabetes
 from odk.schema import schema_ocr
-import graphene
-from graphene_mongo.fields import MongoengineConnectionField
-from odk.database.base import connect
+from odk.database.base import connect # 必要,不知道为啥
 
 
 class Query(graphene.ObjectType):
 
     node = graphene.relay.Node.Field()
-
     users = MongoengineConnectionField(schema_user.UserNode)
-
     diabetes = MongoengineConnectionField(schema_diabetes.DiabetesNode)
-
     ocr = MongoengineConnectionField(schema_ocr.OcrNode)
 
 
@@ -25,7 +23,6 @@ class Mutation(graphene.ObjectType):
     update_user = schema_user.UpdateUser.Field()
     update_diabetes = schema_diabetes.UpdateDiabetes.Field()
     update_ocr = schema_ocr.UpdateOcr.Field()
-
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

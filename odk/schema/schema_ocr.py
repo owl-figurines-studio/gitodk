@@ -2,17 +2,21 @@ from odk.database.model_ocr import ModelOcr
 from graphene_mongo.types import MongoengineObjectType
 import graphene
 
-import cv2
-import base64
 import os
+from datetime import datetime
 
-from odk.utils.ocr.ocr import rowOCR
+from odk.utils.ocr.ocr import rowOCR_path
+from odk.utils.fastdfs.Images import save_image_path
+from odk.utils.base64 import base64_decode
 
 
 class OcrAttribute:
-
-    path = graphene.String()
-    result = graphene.List(graphene.String)
+    pass
+    # path = graphene.String()
+    # result = graphene.List(graphene.String)
+    # createtime = graphene.DateTime()
+    # updatetime = graphene.DateTime()
+    # imageurl = graphene.String()
 
 
 class Ocr(MongoengineObjectType):
@@ -29,6 +33,7 @@ class OcrNode(MongoengineObjectType):
 
 
 class CreateOcrInput(graphene.InputObjectType, OcrAttribute):
+    path = graphene.String(required=True)
     pass
 
 
@@ -40,17 +45,23 @@ class CreateOcr(graphene.Mutation):
         input = CreateOcrInput(required=True)
 
     def mutate(self, info, input):
-        path = input['path']
-        all_path = base64.b64decode(path.encode('utf-8')).decode("utf-8")
-        if os.path.exists(all_path):
-            img = cv2.imread(all_path, 0)
-            lst = rowOCR(img)
+        """
+        createocr的处理函数,
+        :param info: 一般不使用
+        :param input:
+        :return:
+        """
+        based_path = input['path']
+        path = base64_decode(based_path)
+        now = datetime.now()
+        input['createtime'] = input['updatetime'] = now
+        if os.path.exists(path):
+            url = save_image_path(path)
+            input['imageurl'] = url
+            lst = rowOCR_path(path)
             input["result"] = lst
-
-            # os.remove(all_path)
         ocr = ModelOcr(**input)
         ocr.save()
-
         return CreateOcr(ocr=ocr)
 
 
@@ -68,26 +79,19 @@ class UpdateOcr(graphene.Mutation):
 
     def mutate(self, info, input):
         id_ = input.pop("id")
-        id_ = base64.b64decode(id_.encode('utf-8')).decode("utf-8")[8:]
-        print(id_)
+        id_ = base64_decode(id_)[8:]
+        print("---更新的id为:", id_)
         ocr = ModelOcr.objects.get(id=id_)
-        path = ocr['path']
-        # print(path)
-        all_path = base64.b64decode(path.encode('utf-8')).decode("utf-8")
-        # print(all_path)
-        if os.path.exists(all_path):
-            img = cv2.imread(all_path, 0)
-            lst = rowOCR(img)
-            new_input = {"result": lst}
-            # new_input["result"] = lst
-            # print(input)
-            # os.remove(all_path)
-
-            # print(ocr)
+        based_path = ocr['path']
+        path = base64_decode(based_path)
+        print("---path", path)
+        if os.path.exists(path):
+            lst = rowOCR_path(path)
+            url = save_image_path(path)
+            now = datetime.now()
+            new_input = {"result": lst,
+                         "updatetime": now,
+                         "imageurl": url}
             ocr.update(**new_input)
             ocr.save()
-
-
-        # ocr.update(**input)
-        # ocr.save()
         return UpdateOcr(ocr=ocr)

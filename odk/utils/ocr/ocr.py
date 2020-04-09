@@ -1,26 +1,25 @@
 import cv2
 import numpy as np
-# import matplotlib.pylab  as plt
-# import seaborn as sns
-# import pandas as pd
-# import math
+import os
 from PIL import Image as image
 import pytesseract
 
 
-#全局自适应
+# 全局自适应
 def adaptive(img):
     blur = cv2.GaussianBlur(img, (3, 3), 0)
     th = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
     return th
 
-#大津
+
+# 大津
 def otsu(img):
     blur = cv2.GaussianBlur(img, (3, 3), 0)
     ret, th = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return th
 
-#二值化
+
+# 二值化
 def thresholding(img):
   ad = adaptive(img)
   ot = otsu(img)
@@ -29,7 +28,8 @@ def thresholding(img):
   add = 255-cv2.multiply(tot,tad).astype('uint8')*255
   return add
 
-#逐行识别
+
+# 逐行识别
 def rowSegment(img):
   (row,col)=img.shape[0:2]
   # print(row,col)
@@ -67,13 +67,22 @@ def rowOCR(img):
   return rowSegment(add)
 
 
-def rowOCR_path(all_path):
+def get_all_path(path):
+    # 返回绝对路径
+    pwd = os.getcwd()
+    all_path = pwd + path[1:]
+    return all_path
+
+def rowOCR_path(path):
+    all_path = get_all_path(path)
     img = cv2.imread(all_path, 0)
     ret = rowOCR(img)
     return ret
 
 
 if __name__ == '__main__':
-    img = cv2.imread('/home/python/Desktop/gitodk/odk/odk/utils/ocr/mark6.jpg',0)
-    ret = rowOCR(img)
-    print(ret)
+    # img = cv2.imread('/home/python/Desktop/gitodk/odk/odk/utils/ocr/mark6.jpg',0)
+    # ret = rowOCR(img)
+    # print(ret)
+
+    print(get_all_path("./odk/images/mark6.jpg"))
