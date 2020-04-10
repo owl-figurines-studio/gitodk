@@ -80,7 +80,7 @@ def verify():
     """
     短信验证码获取,需要登录
     request.form = {
-        "userphone": "11122223333"
+        "userphone": "12312341234"
     }
     :return:
     """
