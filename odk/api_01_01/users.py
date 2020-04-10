@@ -10,6 +10,7 @@ from odk import db, verify_rs, mongodb
 from odk.libs.yuntongxun.sms import CCP
 from odk.utils.Returns import response_data
 from manage import app
+from odk.utils.check import check_form_key
 
 
 @api.route('/user/code2session', methods=['POST'])
@@ -21,7 +22,12 @@ def wechat_login():
     }
     :return: 头部包含token的响应
     """
-    js_code = request.form['code']
+    must_keys = ["code"]
+    form_data = request.form.to_dict()
+    errmsg = check_form_key(form_data, must_keys)
+    if errmsg:
+        return response_data(2016, errmsg=errmsg)
+    js_code = form_data['code']
     appid = app.config["WECHAT_APP_ID"]
     secret = app.config["WECHAT_SECRET"]
     grant_type = "authorization_code"
