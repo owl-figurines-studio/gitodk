@@ -1,19 +1,55 @@
-from flask_jwt_extended import create_access_token,jwt_required,jwt_optional,get_jwt_identity
-from flask import request,make_response
 import random
+import requests
+
+from flask import request, make_response
+from flask_jwt_extended import create_access_token, jwt_required, jwt_optional, get_jwt_identity
 
 from . import api
 from odk.models import User
-from odk import db,verify_rs,mongodb
+from odk import db, verify_rs, mongodb
 from odk.libs.yuntongxun.sms import CCP
-from odk.utils.Returns import ret_data #,ret_upload_data,ret_user_data
-from odk.utils.fastdfs.Images import save_Image
+from odk.utils.Returns import ret_data
 
-# @api01.route('/userinfo/<myre("\d{5}"):user_id>')
-# def userinfo(user_id):
-#     return '这是用户'
 
-@api.route('/user/verify',methods=['POST'])
+@api.route('/user/code2session', methods=['POST'])
+def wechat_login():
+    """
+    微信登录,获取token
+    request.form = {
+        "code": "043sT4oa1CKHuM1LkVpa1ns4oa1sT4oE"
+    }
+    :return: 头部包含token的响应
+    """
+    js_code = request.form['code']
+    appid = "wxc49a36275e75991b"
+    secret = "c5d0a6c4d637728f0d602ec5d9a6c99e"
+    grant_type = "authorization_code"
+
+    wechat_request_data = {"js_code": js_code,
+                           "appid": appid,
+                           "secret": secret,
+                           "grant_type": grant_type}
+    response = requests.get("https://api.weixin.qq.com/sns/jscode2session", params=wechat_request_data)
+    ret = response.json()
+    print("---response:", ret)
+    if 'errcode' in ret:
+        return ret_data(200, '请求成功', 2012, errmsg=ret['errmsg'])
+    # ret = {
+    #     "session_key": "4xtv9zkCLF9eB7zQWSedgA==",
+    #     "openid": "oRVrU5PzUZ4DEIdT3qKP4wNzJlmc"
+    # }
+    access_token = create_access_token(identity=ret['openid'])
+    print("---token:", access_token)
+    # 构建新的response
+    response, state = ret_data(200, '请求成功', 1010)
+    return_response = make_response(response)
+    # 添加头部token
+    return_response.headers['token'] = access_token
+    return_response.state = state
+    return return_response
+
+
+@api.route('/user/verify', methods=['POST'])
 # 获取手机验证
 # 前端 : POST  表单: userphone=19957892906
 # 后端 : 返回   "验证码获取成功"
@@ -99,91 +135,24 @@ def login():
     # return {'code':200,'message':'请求成功','data':{'verifyStateCode':1001,'message':'验证通过,可登录','access_token':access_token}},200
 
 
-@api.route('/user/code2session',methods=['POST'])
-def wei_login():
-    js_code = request.form['code']
-    appid = "wxc49a36275e75991b"
-    secret = "c5d0a6c4d637728f0d602ec5d9a6c99e"
-    grant_type = "authorization_code"
-    import requests
-    data = {"js_code":js_code,"appid":appid,"secret":secret,"grant_type":grant_type}
-    response = requests.get("https://api.weixin.qq.com/sns/jscode2session", params=data)
-    print("response:",response.json())
-    ret = response.json()
-    if 'errcode' in ret:
-        return ret_data(200,'请求成功',2012,errmsg=ret['errmsg'])
-    # test = {
-    #     "session_key": "4xtv9zkCLF9eB7zQWSedgA==",
-    #     "openid": "oRVrU5PzUZ4DEIdT3qKP4wNzJlmc"
-    # }
-    access_token = create_access_token(identity=ret['openid'])
-    print("token:",access_token)
-    ret, state = ret_data(200, '请求成功', 1010)
-    response = make_response(ret)
-    response.headers['token'] = access_token
-    response.state = state
-    return response
-
-@api.route('/user/test',methods=['GET','POST','DELETE','PUT'])
+@api.route('/user/test', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @jwt_optional
 def test_test():
     user = get_jwt_identity()
-    print(user)
+    # print(user)
+    return_data = {"test": ''}
     if user is None:
         return ret_data(403, '访问被禁止', 2004,)
-        # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2004,'message':'没有登录'}},401
-    if request.method=='POST':
-        return ret_data(200, '请求成功', 1000, test='post method')
-    elif request.method=='GET':
-        return ret_data(200, '请求成功', 1000, test='get method')
-    elif request.method=='DELETE':
-        return ret_data(200, '请求成功', 1000, test='delete method')
-    elif request.method=='PUT':
-        return ret_data(200, '请求成功', 1000, test='put method')
-    return ret_data(200, '请求成功', 1000,test='hello world')
-    # return {'code':200,'message':'请求成功','data':{'verifyStateCode':1000,'message':'登录成功','data':'hello world'}},200
+    if request.method == 'POST':
+        return_data["test"] = 'post method'
+    elif request.method == 'GET':
+        return_data["test"] = 'get method'
+    elif request.method == 'DELETE':
+        return_data["test"] = 'delete method'
+    elif request.method == 'PUT':
+        return_data["test"] = 'put method'
+    return ret_data(200, '请求成功', 1000, **return_data)
 
-
-
-
-
-# @api.route('/user/imageBase64',methods=['POST'])
-# def test_image_base64():
-#     xxx = request.form['imageBase64']
-#     print(xxx)
-#     import base64
-#     import io
-#     from PIL import Image
-#     img_b64decode = base64.b64decode(xxx)  # base64解码
-#
-#     image = io.BytesIO(img_b64decode)
-#     random_str = "%06d.jpg" % random.randint(0, 999999)
-#     # image.filename = random_str
-#     img = Image.open(image)
-#     img = img.convert('RGB')
-#     img.filename = random_str
-#     # img.show()
-#     # img.save('./odk/images/'+random_str)
-#
-#
-#     # return ret_data(200,'请求成功',1000)
-#     # try:
-#     #     file = xxx['UploadImage']
-#     #     print(file)
-#     # except KeyError as e:
-#     #     return ret_data(200,'请求成功',2007)
-#     # return save_Image(image)
-#     return save_Image(img)
-
-# 微信登录
-@api.route('/user/wlogin')
-def wlogin():
-    import odk.utils.const.login_const
-    import requests  # 导入request模块
-    url = 'https://api.weixin.qq.com/sns/jscode2session'
-    response = requests.get(url)  # 用导入的request模块的get方法访问URL
-    print(response.status_code)  # 调用response里的status_code方法查看状态码
-    print(response.text)  # 调用response里的text #字符串方式的响应体，会自动根据响应头部的字符编码进行解码
 
 # 测试git
 @api.route('/user/fhir')
@@ -231,5 +200,5 @@ def fhir():
     print(patient.address)
     print("-------------------------")
     # prints patient's given name array in the first `name` property
-    return ret_data(200,'请求成功',1000)
+    return ret_data(200, '请求成功', 1000)
 
