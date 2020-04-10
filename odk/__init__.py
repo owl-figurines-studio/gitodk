@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_admin import Admin
@@ -22,10 +21,10 @@ client = MongoClient(config_constant["MONGODB_HOST"],
 # 获取操作句柄
 mongodb = client.odk01
 
-verify_rs = Redis(host=config_constant["REDIS_HOST"],
-                  port=config_constant["REDIS_PORT"],
-                  db=config_constant["REDIS_VERIFY_DB"],
-                  decode_responses=True)
+redis_verify = Redis(host=config_constant["REDIS_HOST"],
+                     port=config_constant["REDIS_PORT"],
+                     db=config_constant["REDIS_VERIFY_DB"],
+                     decode_responses=True)
 fastdfs_client = Fdfs_client(config_constant["FASTDFS_CONFIG"])
 
 

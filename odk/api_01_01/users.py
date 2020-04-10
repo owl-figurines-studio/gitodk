@@ -5,7 +5,7 @@ from flask import request, make_response
 from flask_jwt_extended import create_access_token, jwt_required
 
 from . import api
-from odk import verify_rs, mongodb
+from odk import redis_verify, mongodb
 from odk.libs.yuntongxun.sms import CCP
 from odk.utils.Returns import response_data
 from odk.utils.check import check_form_key
@@ -102,7 +102,7 @@ def verify():
 
     # 将生成的短信验证码存入在redis 中
     # 设置过期时间并保存
-    verify_rs.setex(userphone, 120, phone_code)
+    redis_verify.setex(userphone, 120, phone_code)
 
     # 发送短信验证码
     ccp = CCP()
@@ -132,7 +132,7 @@ def verify_ok():
     userphone = form_data['userphone']
 
     # 从redis中取出验证码
-    redis_verification_code = verify_rs.get(userphone)
+    redis_verification_code = redis_verify.get(userphone)
 
     # 判断验证码是不是正确
     if verification_code != redis_verification_code:
