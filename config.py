@@ -24,8 +24,8 @@ class Config(object):
     SECRET_KEY = 'JSFJBJBFEHINKHOHIO'
 
     # 配置mysql
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/odk'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/odk'
+    # SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 配置jwt
     JWT_SECRET_KEY = 'lksjdflkjslfjlkjdsflk'
