@@ -16,7 +16,7 @@ class Config(object):
 
     # 配置jwt
     JWT_SECRET_KEY = 'lksjdflkjslfjlkjdsflk'
-    JWT_ACCESS_TOKEN_EXPIRES = 3600
+    JWT_ACCESS_TOKEN_EXPIRES = 7200
 
     # 后台管理站点配置
     FLASK_ADMIN_SWATCH = 'cerulean'

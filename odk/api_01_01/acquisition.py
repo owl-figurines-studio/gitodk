@@ -11,7 +11,7 @@ from PIL import Image
 # 自己写
 from . import api
 from odk.utils.fastdfs.Images import save_Image
-from odk.utils.Returns import ret_data
+from odk.utils.Returns import response_data
 from odk.utils.ocr.ocr import rowOCR_path
 from odk.utils.fastdfs.Images import save_image_local, save_image_path
 from odk.utils.base64 import base64_decode, base64_encode
@@ -56,10 +56,10 @@ def acquisition_upload_ocr():
     try:
         file = files['UploadImage']
     except KeyError:
-        return ret_data(200, '请求成功', 2007)
+        return response_data(2007)
     path = save_image_local(file)
     based_path = base64_encode(path)
-    return ret_data(200, '请求成功', 1012, path=based_path)
+    return response_data(1012, path=based_path)
 
 
 @api.route('/acquisition/ocr', methods=['POST'])
@@ -70,7 +70,7 @@ def acquisition_getocr():
     """
     request_data = request.form.to_dict()
     if "path" not in request_data.keys():
-        return ret_data(200, "请求成功", 2015)
+        return response_data(2015)
     based_path = request_data['path']
     path = base64_decode(based_path)
     result_list = rowOCR_path(path)
@@ -86,7 +86,7 @@ def acquisition_getocr():
     return_msg = {"id": str(ocr_model.id),
                   "image_url": url,
                   "result": result_list}
-    return ret_data(200, '请求成功', 1012, **return_msg)
+    return response_data(1012, **return_msg)
 
 
 # from odk import celery
@@ -100,4 +100,4 @@ def acquisition_getocr():
 #     b = request.form['b']
 #     ret = add_together.delay(a,b)
 #     print(ret)
-#     return ret_data(200,'请求成功',1000)
+#     return response_data(1000)

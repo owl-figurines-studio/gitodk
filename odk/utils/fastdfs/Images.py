@@ -1,7 +1,7 @@
 import os
 
 from odk import fastdfs_client
-from odk.utils.Returns import ret_data
+from odk.utils.Returns import response_data
 
 
 def save_image_path(path):
@@ -58,5 +58,5 @@ def save_Image(file):
     """
     url = save_image_url(file)
     if url == '':
-        return ret_data(200, '请求成功', 2006)
-    return ret_data(200, '请求成功', 1002, url=url)
+        return response_data(2006)
+    return response_data(1002, url=url)

@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import request
 
 from . import api
-from odk.utils.Returns import ret_data
+from odk.utils.Returns import response_data
 from odk.database.model_diabetes import ModelDiabetes
 from odk.utils.diabetes.predict import predict
 
@@ -29,7 +29,7 @@ def diabetes_predict():
     result = "得病了"
     if ret == 0:
         result = "没有得病"
-    return ret_data(200, '请求成功', 1008, result=result)
+    return response_data(1008, result=result)
 
 
 @api.route('/FhirDiabetes', methods=['POST'])
@@ -55,7 +55,7 @@ def fhir_diabetes_predict():
     result = "得病了"
     if ret == 0:
         result = "没有得病"
-    return ret_data(200, '请求成功', 1008, result=result)
+    return response_data(1008, result=result)
 
 
 

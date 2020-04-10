@@ -1,25 +1,17 @@
-from .ErrorMsg import ERRORMSG
-def base_ret_data(code,messagehttp,**kwargs):
+from odk.utils.ErrorMsg import ERRORMSG
+
+
+def base_ret_data(code, message_http, **kwargs):
     return {'code': code,
-            'message': messagehttp,
+            'message': message_http,
             'data': {**kwargs}
             }, code
 
 
-
-def ret_data(code,messagehttp,verifyStateCode,**kwargs):
-    return base_ret_data(code, messagehttp,
-                         userStateCode=verifyStateCode,
+def response_data(verify_state_code, code=200, message_http="请求成功", **kwargs):
+    return base_ret_data(code, message_http,
+                         userStateCode=verify_state_code,
+                         userStateMessage=ERRORMSG[verify_state_code],
                          **kwargs)
 
-# def ret_user_data(code,messagehttp,userStateCode,**kwargs):
-#     return base_ret_data(code, messagehttp,
-#                          userStateCode=userStateCode,
-#                          **kwargs)
-#
-#
-# def ret_upload_data(code,messagehttp,uploadStateCode,**kwargs):
-#     return base_ret_data(code, messagehttp,
-#                          uploadStateCode=uploadStateCode,
-#                          **kwargs)
 

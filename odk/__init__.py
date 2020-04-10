@@ -13,7 +13,7 @@ from flask_admin.contrib.sqla import ModelView
 
 from config import config
 from odk.utils.MyCoverter import MyCoverter
-from odk.utils.Returns import ret_data
+from odk.utils.Returns import response_data
 
 from fdfs_client.client import Fdfs_client
 from pymongo import MongoClient
@@ -64,7 +64,7 @@ def create_app(config_name):
     @jwt.expired_token_loader
     @jwt.invalid_token_loader
     def my_expired_token_callback(expired_token):
-        return ret_data(401,'身份信息有误',2004,)
+        return response_data(2004, 401, '身份信息有误')
 
 
     app.config.from_object(config[config_name])

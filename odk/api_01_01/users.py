@@ -8,7 +8,7 @@ from . import api
 from odk.models import User
 from odk import db, verify_rs, mongodb
 from odk.libs.yuntongxun.sms import CCP
-from odk.utils.Returns import ret_data
+from odk.utils.Returns import response_data
 from manage import app
 
 
@@ -34,7 +34,7 @@ def wechat_login():
     ret = response.json()
     print("---response:", ret)
     if 'errcode' in ret:
-        return ret_data(200, '请求成功', 2012, errmsg=ret['errmsg'])
+        return response_data(2012, errmsg=ret['errmsg'])
     # ret = {
     #     "session_key": "4xtv9zkCLF9eB7zQWSedgA==",
     #     "openid": "oRVrU5PzUZ4DEIdT3qKP4wNzJlmc"
@@ -42,7 +42,7 @@ def wechat_login():
     access_token = create_access_token(identity=ret['openid'])
     print("---token:", access_token)
     # 构建新的response
-    response, state = ret_data(200, '请求成功', 1010)
+    response, state = response_data(1010)
     return_response = make_response(response)
     # 添加头部token
     return_response.headers['token'] = access_token
@@ -60,11 +60,11 @@ def verify():
     print(userphone)
     print(type(userphone))
     if userphone is None:
-        return ret_data(403, '访问被禁止', 2002)
+        return response_data(2002, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2001,'message':'手机号为空'}},403
 
     if userphone == '' or len(userphone)!=11:
-        return ret_data(403,'访问被禁止',2002)
+        return response_data(2002, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2002,'message':'手机号格式错误'}},403
     # todo 生成短信验证码
     phone_code = '%06d' % random.randint(0, 999999)
@@ -79,8 +79,8 @@ def verify():
     ccp = CCP()
     ccp.send_template_sms(userphone, [phone_code ,1], 1)
 
-    return ret_data(200,'请求成功',1000)
-    # return {'code':200,'message':'请求成功','data':{'message':'获取验证码成功','verifyStateCode':1000}},200
+    return response_data(1000)
+
 
 @api.route('/user/verifyok',methods=['POST'])
 @jwt_required
@@ -91,13 +91,14 @@ def verifyok():
         get_redis_verify=verify_rs.get(qian_userphone)
     except:
         print('前端输入错误')
-        return ret_data(403, '访问被禁止', 2003)
+        return response_data(2003, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
     # 判断验证码是不是正确
     if qian_vercode!=get_redis_verify:
-        return ret_data(403, '访问被禁止', 2003)
+        return response_data(2003, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
-    return ret_data(200,'请求成功',1001)
+    return response_data(1001)
+
 
 @api.route('/user/login',methods=['POST'])
 # 用户登录
@@ -105,14 +106,14 @@ def login():
     try:# 获取手机号和验证码
         qian_vercode=request.form['verification_code']
         qian_userphone = request.form['userphone']
-        get_redis_verify=verify_rs.get(qian_userphone)
+        get_redis_verify = verify_rs.get(qian_userphone)
     except:
         print('前端输入错误')
-        return ret_data(403, '访问被禁止', 2003)
+        return response_data(2003, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
     # 判断验证码是不是正确
-    if qian_vercode!=get_redis_verify:
-        return ret_data(403, '访问被禁止', 2003)
+    if qian_vercode != get_redis_verify:
+        return response_data(2003, 403, '访问被禁止')
         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
     # 从数据库中查找用户
     user_lst=User.query.filter_by(user_phone=qian_userphone).all()
@@ -127,13 +128,12 @@ def login():
         print('已有user,不操作')
     # 新建jwt,并返回个前端
     access_token = create_access_token(identity=qian_userphone)
-    ret,state = ret_data(200, '请求成功', 1007)
+    ret,state = response_data(1007)
     response = make_response(ret)
     response.headers['token'] = access_token
     response.state = state
 
     return response
-    # return {'code':200,'message':'请求成功','data':{'verifyStateCode':1001,'message':'验证通过,可登录','access_token':access_token}},200
 
 
 @api.route('/user/test', methods=['GET', 'POST', 'DELETE', 'PUT'])
@@ -143,7 +143,7 @@ def test_test():
     # print(user)
     return_data = {"test": ''}
     if user is None:
-        return ret_data(403, '访问被禁止', 2004,)
+        return response_data(2004, 403, '访问被禁止')
     if request.method == 'POST':
         return_data["test"] = 'post method'
     elif request.method == 'GET':
@@ -152,7 +152,7 @@ def test_test():
         return_data["test"] = 'delete method'
     elif request.method == 'PUT':
         return_data["test"] = 'put method'
-    return ret_data(200, '请求成功', 1000, **return_data)
+    return response_data(1000, **return_data)
 
 
 # 测试git
@@ -201,5 +201,5 @@ def fhir():
     print(patient.address)
     print("-------------------------")
     # prints patient's given name array in the first `name` property
-    return ret_data(200, '请求成功', 1000)
+    return response_data(1000)
 
