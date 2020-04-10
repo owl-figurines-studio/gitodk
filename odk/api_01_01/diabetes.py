@@ -25,8 +25,7 @@ def diabetes_predict():
     print("---整理后的data数据:", data)
     diabetes = ModelDiabetes(**data)
     diabetes.save()
-    pwd = os.getcwd()
-    ret = predict(data, pwd+"/odk")
+    ret = predict(data)
     result = "得病了"
     if ret == 0:
         result = "没有得病"
