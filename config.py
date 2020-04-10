@@ -25,6 +25,11 @@ class Config(object):
     CELERY_BROKER_URL = 'redis://localhost:6379'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 
+    # 微信登录需要的配置文件
+    WECHAT_APP_ID = "wxc49a36275e75991b"
+    WECHAT_SECRET = "c5d0a6c4d637728f0d602ec5d9a6c99e"
+    WECHAT_URL = "https://api.weixin.qq.com/sns/jscode2session"
+
 
 class DevelopConfig(Config):
     DEBUG = True

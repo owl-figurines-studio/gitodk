@@ -9,6 +9,7 @@ from odk.models import User
 from odk import db, verify_rs, mongodb
 from odk.libs.yuntongxun.sms import CCP
 from odk.utils.Returns import ret_data
+from manage import app
 
 
 @api.route('/user/code2session', methods=['POST'])
@@ -21,15 +22,15 @@ def wechat_login():
     :return: 头部包含token的响应
     """
     js_code = request.form['code']
-    appid = "wxc49a36275e75991b"
-    secret = "c5d0a6c4d637728f0d602ec5d9a6c99e"
+    appid = app.config["WECHAT_APP_ID"]
+    secret = app.config["WECHAT_SECRET"]
     grant_type = "authorization_code"
 
     wechat_request_data = {"js_code": js_code,
                            "appid": appid,
                            "secret": secret,
                            "grant_type": grant_type}
-    response = requests.get("https://api.weixin.qq.com/sns/jscode2session", params=wechat_request_data)
+    response = requests.get(app.config["WECHAT_URL"], params=wechat_request_data)
     ret = response.json()
     print("---response:", ret)
     if 'errcode' in ret:
