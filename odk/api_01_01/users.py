@@ -2,14 +2,14 @@ import random
 import requests
 
 from flask import request, make_response
-from flask_jwt_extended import create_access_token, jwt_required, jwt_optional, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required
 
 from . import api
 from odk import verify_rs, mongodb
 from odk.libs.yuntongxun.sms import CCP
 from odk.utils.Returns import response_data
-from manage import app
 from odk.utils.check import check_form_key
+from config import config_constant
 
 
 @api.route('/user/test', methods=['GET', 'POST', 'DELETE', 'PUT'])
@@ -46,15 +46,15 @@ def wechat_login():
     if errmsg:
         return response_data(2016, errmsg=errmsg)
     js_code = form_data['code']
-    appid = app.config["WECHAT_APP_ID"]
-    secret = app.config["WECHAT_SECRET"]
+    appid = config_constant["WECHAT_APP_ID"]
+    secret = config_constant["WECHAT_SECRET"]
     grant_type = "authorization_code"
 
     wechat_request_data = {"js_code": js_code,
                            "appid": appid,
                            "secret": secret,
                            "grant_type": grant_type}
-    response = requests.get(app.config["WECHAT_URL"], params=wechat_request_data)
+    response = requests.get(config_constant["WECHAT_URL"], params=wechat_request_data)
     ret = response.json()
     print("---response:", ret)
     if 'errcode' in ret:
@@ -72,49 +72,6 @@ def wechat_login():
     return_response.headers['token'] = access_token
     return_response.state = state
     return return_response
-
-# 短信登录,不需要了
-# @api.route('/user/login', methods=['POST'])
-# def login():
-#     """
-#     登录
-#     request.form = {
-#         "userphone" = "11122223333"
-#         "verification_code" = "
-#     }
-#     :return:
-#     """
-#     try:# 获取手机号和验证码
-#         qian_vercode=request.form['verification_code']
-#         qian_userphone = request.form['userphone']
-#         get_redis_verify = verify_rs.get(qian_userphone)
-#     except:
-#         print('前端输入错误')
-#         return response_data(2003, 403, '访问被禁止')
-#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
-#     # 判断验证码是不是正确
-#     if qian_vercode != get_redis_verify:
-#         return response_data(2003, 403, '访问被禁止')
-#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
-#     # 从数据库中查找用户
-#     user_lst=User.query.filter_by(user_phone=qian_userphone).all()
-#     # 查找结果为空,则新建
-#     print(user_lst)
-#     if user_lst == []:
-#         print('新创建一个user')
-#         obj = User(user_phone=qian_userphone)
-#         db.session.add(obj)
-#         db.session.commit()
-#     else:
-#         print('已有user,不操作')
-#     # 新建jwt,并返回个前端
-#     access_token = create_access_token(identity=qian_userphone)
-#     ret,state = response_data(1007)
-#     response = make_response(ret)
-#     response.headers['token'] = access_token
-#     response.state = state
-#
-#     return response
 
 
 @api.route('/user/verify', methods=['POST'])
@@ -184,7 +141,6 @@ def verify_ok():
     return response_data(1001)
 
 
-
 @api.route('/user/fhir')
 def fhir():
     import fhirclient.models.patient as p
@@ -197,7 +153,6 @@ def fhir():
     name.given = ['Peter']
     name.family = 'Parker'
     patient.name = [name]
-
 
     print(mongodb)
 
@@ -229,6 +184,47 @@ def fhir():
     print(patient.photo)
     print(patient.address)
     print("-------------------------")
-    # prints patient's given name array in the first `name` property
     return response_data(1000)
 
+# 短信登录,不需要了
+# @api.route('/user/login', methods=['POST'])
+# def login():
+#     """
+#     登录
+#     request.form = {
+#         "userphone" = "11122223333"
+#         "verification_code" = "
+#     }
+#     :return:
+#     """
+#     try:# 获取手机号和验证码
+#         qian_vercode=request.form['verification_code']
+#         qian_userphone = request.form['userphone']
+#         get_redis_verify = verify_rs.get(qian_userphone)
+#     except:
+#         print('前端输入错误')
+#         return response_data(2003, 403, '访问被禁止')
+#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
+#     # 判断验证码是不是正确
+#     if qian_vercode != get_redis_verify:
+#         return response_data(2003, 403, '访问被禁止')
+#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
+#     # 从数据库中查找用户
+#     user_lst=User.query.filter_by(user_phone=qian_userphone).all()
+#     # 查找结果为空,则新建
+#     print(user_lst)
+#     if user_lst == []:
+#         print('新创建一个user')
+#         obj = User(user_phone=qian_userphone)
+#         db.session.add(obj)
+#         db.session.commit()
+#     else:
+#         print('已有user,不操作')
+#     # 新建jwt,并返回个前端
+#     access_token = create_access_token(identity=qian_userphone)
+#     ret,state = response_data(1007)
+#     response = make_response(ret)
+#     response.headers['token'] = access_token
+#     response.state = state
+#
+#     return response

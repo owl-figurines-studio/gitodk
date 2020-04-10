@@ -1,8 +1,7 @@
 from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
 from celery import Celery
 
-from odk import create_app, db
+from odk import create_app
 
 
 # 创建app
@@ -16,8 +15,8 @@ celery.conf.update(app.config)
 manager = Manager(app)
 
 # 数据库迁移管理
-Migrate(app, db)
-manager.add_command('db', MigrateCommand)
+# Migrate(app, db)
+# manager.add_command('db', MigrateCommand)
 
 
 if __name__ == '__main__':
