@@ -7,5 +7,6 @@ def check_form_key(form, keys):
     if no_exist_keys:
         errmsg = ",".join(no_exist_keys)
         errmsg = "字段"+errmsg+"不存在"
+        print(errmsg)
     return errmsg
 
