@@ -54,7 +54,8 @@ class CreateOcr(graphene.Mutation):
         based_path = input['path']
         path = base64_decode(based_path)
         now = datetime.now()
-        input['createtime'] = input['updatetime'] = now
+        input['createtime'] = now
+        input['updatetime'] = now
         if os.path.exists(path):
             url = save_image_path(path)
             input['imageurl'] = url
