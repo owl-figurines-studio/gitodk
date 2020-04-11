@@ -109,7 +109,7 @@ def acquisition_asyocr_result():
     task = celery_task_ocr.AsyncResult(task_id)
     response = {"state": task.state}
     if task.state == 'SUCCESS':
-        response['result'] = task.info
+        response['result'] = task.info["ocr_result"]
     return response_data(1011, **response)
 
 

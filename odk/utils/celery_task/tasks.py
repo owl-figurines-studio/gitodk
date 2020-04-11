@@ -10,9 +10,10 @@ from ..ocr.ocr import rowOCR_path
 # 文件的创建
 log_path = "logs/celery/"
 log_filename = "celery_task.log"
-if not os.path.exists(log_path+log_filename):
+if not os.path.exists(log_path):
     os.makedirs(log_path)
-    os.mknod(log_filename)
+if not os.path.exists(log_path+log_filename):
+    os.mknod(log_path+log_filename)
 
 # 创建celery
 celery_app = Celery("odk_celery",
