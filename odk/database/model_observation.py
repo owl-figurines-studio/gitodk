@@ -1,6 +1,3 @@
-# import sys
-# sys.path.append("..")
-
 from mongoengine import Document
 from mongoengine import (StringField, IntField,DictField)
 
