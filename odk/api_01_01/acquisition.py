@@ -16,7 +16,7 @@ from odk.utils.ocr.ocr import rowOCR_path
 from odk.utils.fastdfs.Images import save_image_local, save_image_path
 from odk.utils.base64 import base64_decode, base64_encode
 from odk.database.model_ocr import ModelOcr
-from odk.utils.celery_task.tasks import add_together,celery_task_ocr
+from odk.utils.celery_task.tasks import add_together, celery_task_ocr
 
 
 @api.route('/acquisition/imagebase64', methods=['POST'])
@@ -107,10 +107,15 @@ def acquisition_asyocr():
 def acquisition_asyocr_result():
     task_id = request.form['task_id']
     task = celery_task_ocr.AsyncResult(task_id)
-    response = {"state": task.state}
+    return_msg = {"state": task.state}
+    message_code = 1011
     if task.state == 'SUCCESS':
-        response['result'] = task.info["ocr_result"]
-    return response_data(1011, **response)
+        return_msg['result'] = task.info["ocr_result"]
+    elif task.state == 'PENDING':
+        message_code = 1013
+    else:
+        message_code = 3000
+    return response_data(message_code, **return_msg)
 
 
 @api.route('/acquisition/add', methods=['POST'])
