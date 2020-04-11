@@ -16,6 +16,7 @@ from odk.utils.ocr.ocr import rowOCR_path
 from odk.utils.fastdfs.Images import save_image_local, save_image_path
 from odk.utils.base64 import base64_decode, base64_encode
 from odk.database.model_ocr import ModelOcr
+from odk.utils.celery_task.tasks import add_together,celery_task_ocr
 
 
 @api.route('/acquisition/imagebase64', methods=['POST'])
@@ -89,15 +90,55 @@ def acquisition_getocr():
     return response_data(1012, **return_msg)
 
 
-# from odk import celery
-# @celery.task()
-# def add_together(a, b):
-#     return a + b
-#
-# @api.route('/acquisition/asyocr', methods=['POST'])
-# def acquisition_asyocr():
-#     a = request.form['a']
-#     b = request.form['b']
-#     ret = add_together.delay(a,b)
-#     print(ret)
-#     return response_data(1000)
+@api.route('/acquisition/asyocr', methods=['POST'])
+def acquisition_asyocr():
+    files = request.files
+    try:
+        file = files['UploadImage']
+    except KeyError:
+        return response_data(2007)
+    path = save_image_local(file)
+    task = celery_task_ocr.delay(path)
+    print("---task.id:", task.id)
+    return response_data(1000, task_id=task.id)
+
+
+@api.route('/acquisition/asyocr_result', methods=['POST'])
+def acquisition_asyocr_result():
+    task_id = request.form['task_id']
+    task = celery_task_ocr.AsyncResult(task_id)
+    response = {"state": task.state}
+    if task.state == 'SUCCESS':
+        response['result'] = task.info
+    return response_data(1011, **response)
+
+
+@api.route('/acquisition/add', methods=['POST'])
+def acquisition_add():
+    a = request.form['a']
+    b = request.form['b']
+    task = add_together.delay(int(a), int(b))
+    print("---task.id:", task.id)
+    return response_data(1000, task_id=task.id)
+
+
+@api.route('/acquisition/add_result', methods=['POST'])
+def acquisition_add_result():
+    task_id = request.form['task_id']
+    task = add_together.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        #  job did not start yet
+        response = {
+            'state': task.state,
+        }
+    elif task.state != 'FAILURE':
+        response = {
+            'state': task.state,
+            'result': task.info
+        }
+    else:
+        # something went wrong in the background job
+        response = {
+            'state': task.state,
+        }
+    return response_data(1011, **response)

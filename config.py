@@ -7,12 +7,16 @@ config_constant = {
     "REDIS_HOST": '127.0.0.1',
     "REDIS_PORT": 6379,
     "REDIS_VERIFY_DB": 8,
+    "REDIS_CELERY_DB": 1,
     # mongodb配置
     "MONGODB_HOST": "127.0.0.1",
     "MONGODB_PORT": 27017,
     "MONGODB_DB": "odk01",
     # fasrdfs配置
     "FASTDFS_CONFIG": './odk/utils/fastdfs/client.conf',
+    "CELERY_LOG_PATH": "logs/celery/",
+    "CELERY_LOG_FILENAME":"celery_task.log",
+
 }
 
 
@@ -35,8 +39,12 @@ class Config(object):
     FLASK_ADMIN_SWATCH = 'cerulean'
 
     # celery配置
-    CELERY_BROKER_URL = 'redis://'+config_constant["REDIS_HOST"]+':'+str(config_constant["REDIS_PORT"])
-    CELERY_RESULT_BACKEND = 'redis://'+config_constant["REDIS_HOST"]+':'+str(config_constant["REDIS_PORT"])
+    CELERY_BROKER_URL = 'redis://'+config_constant["REDIS_HOST"]\
+                        + ':'+str(config_constant["REDIS_PORT"])\
+                        + "/"+str(config_constant["REDIS_CELERY_DB"])
+    CELERY_RESULT_BACKEND = 'redis://'+config_constant["REDIS_HOST"]\
+                            + ':'+str(config_constant["REDIS_PORT"])\
+                            + "/"+str(config_constant["REDIS_CELERY_DB"])
 
 
 class DevelopConfig(Config):
