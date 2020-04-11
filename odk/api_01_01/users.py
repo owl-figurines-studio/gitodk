@@ -147,7 +147,6 @@ def fhir():
     import fhirclient.models.humanname as hn
     patient = p.Patient({'id': 'patient-1'})
     print(patient.id)
-    # prints `patient-1`
 
     name = hn.HumanName()
     name.given = ['Peter']
