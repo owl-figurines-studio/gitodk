@@ -1,5 +1,5 @@
 from mongoengine import Document
-from mongoengine import StringField, IntField, DictField, DateTimeField, ReferenceField
+from mongoengine import StringField, IntField, DictField, DateTimeField, ReferenceField, DecimalField
 
 from .model_patient import ModelPatient
 from .model_encounter import ModelEncounter
@@ -17,8 +17,10 @@ class ModelObservation(Document):
 
     encounter = DictField(reference=ReferenceField(ModelEncounter), required=True)
 
-    code = DictField()
+    code = DictField(test=StringField(required=True))
 
-    valueQuantity = DictField()
+    valueQuantity = DictField(value=DecimalField(),
+                              unit=StringField(),
+                              code=StringField()),
 
     delete_flag = IntField(default=0, required=True)
