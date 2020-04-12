@@ -1,20 +1,21 @@
 from mongoengine import Document
-from mongoengine import (StringField, IntField,DictField)
+from mongoengine import StringField, IntField, DictField, DateTimeField, ReferenceField
+
+from .model_patient import ModelPatient
+from .model_encounter import ModelEncounter
 
 
 class ModelObservation(Document):
 
     meta = {"collection": "observation"}
 
-    id = StringField(primary_key=True)
+    resourceType = StringField(required=True, default="observation")
 
-    resourceType = StringField(required=True)
+    meta_model = DictField(lastUpdated=DateTimeField(required=True),)
 
-    meta_ = DictField()
+    subject = DictField(reference=ReferenceField(ModelPatient), required=True)
 
-    subject = DictField()
-
-    encounter = DictField()
+    encounter = DictField(reference=ReferenceField(ModelEncounter), required=True)
 
     code = DictField()
 
