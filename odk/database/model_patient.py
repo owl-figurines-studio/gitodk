@@ -1,5 +1,5 @@
 from mongoengine import Document
-from mongoengine import StringField, IntField, DictField, DateField, BooleanField, ListField
+from mongoengine import StringField, DictField, DateField, BooleanField, ListField
 
 
 class ModelPatient(Document):
