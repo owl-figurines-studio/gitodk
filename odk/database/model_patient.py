@@ -14,7 +14,11 @@ class ModelPatient(Document):
 
     birthDate = StringField()
 
-    code = ListField(DictField(subject=StringField()))
+    code = EmbeddedDocumentField(SubInput)
+
+    test = EmbeddedDocumentField(SubInput)
+
+    # code = ListField(DictField(subject=StringField()))
 
     # code = EmbeddedDocumentListField(SubInput)
     #

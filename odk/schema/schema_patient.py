@@ -2,18 +2,23 @@ from odk.database.model_patient import ModelPatient
 from graphene_mongo.types import MongoengineObjectType
 import graphene
 
+from odk.database.model_patient import SubInput as SubModel
 import os
 from datetime import datetime
 
 from odk.utils.ocr.ocr import rowOCR_path
 from odk.utils.fastdfs.Images import save_image_path
 from odk.utils.base64 import base64_decode
-
-
+# InputObjectType
+class SubInput:
+    subject = graphene.String()
 
 class PatientAttribute:
     birthDate = graphene.String()
-
+    code = SubInput()
+    test = SubInput()
+    # code = SubInput()
+    # code = graphene.List(SubInput)
     pass
     # path = graphene.String()
     # result = graphene.List(graphene.String)
@@ -27,6 +32,12 @@ class Patient(MongoengineObjectType):
     class Meta:
         model = ModelPatient
 
+class SubInputNode(MongoengineObjectType):
+    class Meta:
+        model = SubModel
+        interfaces = (graphene.relay.Node,)
+
+
 
 class PatientNode(MongoengineObjectType):
 
@@ -35,13 +46,12 @@ class PatientNode(MongoengineObjectType):
         interfaces = (graphene.relay.Node, )
 
 
-class SubInput(graphene.InputObjectType):
-    subject = graphene.String()
+
 
 
 class CreatePatientInput(graphene.InputObjectType, PatientAttribute):
     # path = graphene.String(required=True)
-    code = graphene.List(SubInput)
+
     pass
 
 
@@ -59,7 +69,7 @@ class CreatePatient(graphene.Mutation):
         :param input:
         :return:
         """
-        print(input)
+        # print(input)
         # lst, input['code'] = input['code'], list()
         # for i in lst:
         #     input['code'].append(dict(i))

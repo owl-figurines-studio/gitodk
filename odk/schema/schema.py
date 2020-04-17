@@ -16,6 +16,7 @@ class Query(graphene.ObjectType):
     diabetes = MongoengineConnectionField(schema_diabetes.DiabetesNode)
     ocr = MongoengineConnectionField(schema_ocr.OcrNode)
     patient = MongoengineConnectionField(schema_patient.PatientNode)
+    subinput = MongoengineConnectionField(schema_patient.SubInputNode)
     # patient_all = graphene.List(ModelPatient)
     #
     # def resolve_users(self, info):
