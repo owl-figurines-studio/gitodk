@@ -1,8 +1,32 @@
+from datetime import datetime
+
 from mongoengine import Document
 from mongoengine import StringField, IntField, DictField, DateTimeField, ReferenceField, DecimalField
 
-from .model_patient import ModelPatient
-from .model_encounter import ModelEncounter
+from .observationcode import obs_code
+from mongoengine import EmbeddedDocumentField, EmbeddedDocument
+
+
+class ObservationMeta(EmbeddedDocument):
+    lastUpdated = DateTimeField(default=datetime.now())
+
+
+class ObservationSubject(EmbeddedDocument):
+    reference = StringField()
+
+
+class ObservationEncounter(EmbeddedDocument):
+    reference = StringField()
+
+
+class ObservationCode(EmbeddedDocument):
+    text = StringField(choices=obs_code.keys())
+
+
+class ObservationValueQuantity(EmbeddedDocument):
+    value = DecimalField()
+    unit = StringField()
+    code = StringField()
 
 
 class ModelObservation(Document):
@@ -11,16 +35,14 @@ class ModelObservation(Document):
 
     resourceType = StringField(required=True, default="observation")
 
-    meta_model = DictField(lastUpdated=DateTimeField(required=True),)
+    metamodel = EmbeddedDocumentField(ObservationMeta)
 
-    subject = DictField(reference=ReferenceField(ModelPatient), required=True)
+    subject = EmbeddedDocumentField(ObservationSubject)
 
-    encounter = DictField(reference=ReferenceField(ModelEncounter), required=True)
+    encounter = EmbeddedDocumentField(ObservationEncounter)
 
-    code = DictField(test=StringField(required=True))
+    code = EmbeddedDocumentField(ObservationCode)
 
-    valueQuantity = DictField(value=DecimalField(),
-                              unit=StringField(),
-                              code=StringField()),
+    valueQuantity = EmbeddedDocumentField(ObservationValueQuantity)
 
-    delete_flag = IntField(default=0, required=True)
+
