@@ -7,7 +7,5 @@ class ModelEncounter(Document):
 
     resourceType = StringField(required=True, default="encounter")
 
-    identifier = ListField(DictField(identifer=StringField(required=True)))
-
     class_model = DictField(code=StringField(required=True))
 
