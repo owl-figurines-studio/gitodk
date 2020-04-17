@@ -7,6 +7,7 @@ from odk.schema import schema_ocr
 from odk.schema import schema_patient
 from odk.database.base import connect # 必要,不知道为啥
 
+from odk.database.model_patient import ModelPatient
 
 class Query(graphene.ObjectType):
 
@@ -15,7 +16,10 @@ class Query(graphene.ObjectType):
     diabetes = MongoengineConnectionField(schema_diabetes.DiabetesNode)
     ocr = MongoengineConnectionField(schema_ocr.OcrNode)
     patient = MongoengineConnectionField(schema_patient.PatientNode)
-
+    # patient_all = graphene.List(ModelPatient)
+    #
+    # def resolve_users(self, info):
+    #     return list(ModelPatient.objects.all())
 
 class Mutation(graphene.ObjectType):
     create_user = schema_user.CreateUser.Field()

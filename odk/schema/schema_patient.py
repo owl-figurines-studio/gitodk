@@ -1,9 +1,6 @@
 from odk.database.model_patient import ModelPatient
 from graphene_mongo.types import MongoengineObjectType
-from graphene import String, List, Boolean, Date, ObjectType, InputObjectType, ID
-from graphene.relay import Node
-from graphene import Mutation
-from graphene import Field
+import graphene
 
 import os
 from datetime import datetime
@@ -13,13 +10,16 @@ from odk.utils.fastdfs.Images import save_image_path
 from odk.utils.base64 import base64_decode
 
 
+
 class PatientAttribute:
-    # gender = String()
-    birthday = String()
-    # name = List(String)
-    # address = List(String)
-    # resourceType = String()
-    # active = Boolean()
+    birthDate = graphene.String()
+
+    pass
+    # path = graphene.String()
+    # result = graphene.List(graphene.String)
+    # createtime = graphene.DateTime()
+    # updatetime = graphene.DateTime()
+    # imageurl = graphene.String()
 
 
 class Patient(MongoengineObjectType):
@@ -32,31 +32,70 @@ class PatientNode(MongoengineObjectType):
 
     class Meta:
         model = ModelPatient
-        interfaces = (Node, )
+        interfaces = (graphene.relay.Node, )
 
 
-class CreatePatientInput(InputObjectType, PatientAttribute):
-    # path = String(required=True)
+class SubInput(graphene.InputObjectType):
+    subject = graphene.String()
+
+
+class CreatePatientInput(graphene.InputObjectType, PatientAttribute):
+    # path = graphene.String(required=True)
+    code = graphene.List(SubInput)
     pass
 
 
-class CreatePatient(Mutation):
+class CreatePatient(graphene.Mutation):
 
-    pat = Field(lambda: PatientNode)
+    patient = graphene.Field(lambda: PatientNode)
 
     class Arguments:
         input = CreatePatientInput(required=True)
 
     def mutate(self, info, input):
-        # str_p = '2019-01-30'
-        # dateTime_p = datetime.strptime(str_p, '%Y-%m-%d')
-        # print(dateTime_p)
-        # must_keys = []
-
-        # model_data = dict()
+        """
+        createocr的处理函数,
+        :param info: 一般不使用
+        :param input:
+        :return:
+        """
         print(input)
-        pat = ModelPatient(**input)
-        pat.save()
-        return CreatePatient(pat=pat)
+        # lst, input['code'] = input['code'], list()
+        # for i in lst:
+        #     input['code'].append(dict(i))
+        print(input)
+        patient = ModelPatient(**input)
+        patient.save()
+        return CreatePatient(patient=patient)
 
 
+# class UpdateOcrInput(graphene.InputObjectType, OcrAttribute):
+#     id = graphene.ID(required=True)
+#     pass
+#
+#
+# class UpdateOcr(graphene.Mutation):
+#
+#     ocr = graphene.Field(lambda: OcrNode)
+#
+#     class Arguments:
+#         input = UpdateOcrInput(required=True)
+#
+#     def mutate(self, info, input):
+#         id_ = input.pop("id")
+#         id_ = base64_decode(id_)[8:]
+#         print("---更新的id为:", id_)
+#         ocr = ModelOcr.objects.get(id=id_)
+#         based_path = ocr['path']
+#         path = base64_decode(based_path)
+#         print("---path", path)
+#         if os.path.exists(path):
+#             lst = rowOCR_path(path)
+#             url = save_image_path(path)
+#             now = datetime.now()
+#             new_input = {"result": lst,
+#                          "updatetime": now,
+#                          "imageurl": url}
+#             ocr.update(**new_input)
+#             ocr.save()
+#         return UpdateOcr(ocr=ocr)

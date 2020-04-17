@@ -1,6 +1,7 @@
 from mongoengine import Document
-from mongoengine import StringField, DictField, DateField, BooleanField, ListField
-
+from mongoengine import StringField, DictField, DateField, BooleanField, ListField, EmbeddedDocumentField,EmbeddedDocumentListField, EmbeddedDocument
+class SubInput(EmbeddedDocument):
+    subject = StringField()
 
 class ModelPatient(Document):
     meta = {"collection": "patient"}
@@ -12,6 +13,10 @@ class ModelPatient(Document):
     # gender = StringField(required=True) #, choices=['male', "female"])
 
     birthDate = StringField()
+
+    code = ListField(DictField(subject=StringField()))
+
+    # code = EmbeddedDocumentListField(SubInput)
     #
     # name = ListField(StringField())
     #
