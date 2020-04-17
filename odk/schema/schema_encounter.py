@@ -19,10 +19,12 @@ class Encounter(MongoengineObjectType):
     class Meta:
         model = ModelEncounter
 
+
 class ClassNode(MongoengineObjectType):
     class Meta:
         model = ClassModel
         interfaces = (graphene.relay.Node, )
+
 
 class EncounterNode(MongoengineObjectType):
 
@@ -32,7 +34,6 @@ class EncounterNode(MongoengineObjectType):
 
 
 class CreateEncounterInput(graphene.InputObjectType, EncounterAttribute):
-    # path = graphene.String(required=True)
     pass
 
 
@@ -43,7 +44,7 @@ class CreateEncounter(graphene.Mutation):
         input = CreateEncounterInput(required=True)
 
     def mutate(self, info, input):
-        print(input)
+        print("---input:", input)
         encounter = ModelEncounter(**input)
         encounter.save()
         return CreateEncounter(encounter=encounter)
@@ -62,9 +63,8 @@ class UpdateEncounter(graphene.Mutation):
 
     def mutate(self, info, input):
         id_ = input.pop("id")
-        # PatientNode:5e994f1b85c72524e35a5db2
+        # EncounterNode:5e994f1b85c72524e35a5db2
         id_ = base64_decode(id_)[14:]
-        print(id_)
         print("---更新的id为:", id_)
         encounter = ModelEncounter.objects.get(id=id_)
         encounter.update(**input)

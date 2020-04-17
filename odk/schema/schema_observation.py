@@ -10,18 +10,42 @@ class ObservationSubjectAttribute(graphene.InputObjectType):
     reference = graphene.String()
 
 
+class ObservationSubjectNode(MongoengineObjectType):
+    class Meta:
+        model = ObservationSubject
+        interfaces = (graphene.relay.Node, )
+
+
 class ObservationEncounterAttribute(graphene.InputObjectType):
     reference = graphene.String()
+
+
+class ObservationEncounterNode(MongoengineObjectType):
+    class Meta:
+        model = ObservationEncounter
+        interfaces = (graphene.relay.Node, )
 
 
 class ObservationCodeAttribute(graphene.InputObjectType):
     text = graphene.String()
 
 
+class ObservationCodeNode(MongoengineObjectType):
+    class Meta:
+        model = ObservationCode
+        interfaces = (graphene.relay.Node, )
+
+
 class ObservationValueQuantityAttribute(graphene.InputObjectType):
     value = graphene.Float()
     unit = graphene.String()
     code = graphene.String()
+
+
+class ObservationValueQuantityNode(MongoengineObjectType):
+    class Meta:
+        model = ObservationValueQuantity
+        interfaces = (graphene.relay.Node, )
 
 
 class ObservationAttribute:
@@ -46,7 +70,6 @@ class ObservationNode(MongoengineObjectType):
 
 
 class CreateObservationInput(graphene.InputObjectType, ObservationAttribute):
-    # path = graphene.String(required=True)
     pass
 
 
@@ -57,7 +80,7 @@ class CreateObservation(graphene.Mutation):
         input = CreateObservationInput(required=True)
 
     def mutate(self, info, input):
-        print(input)
+        print("---input:", input)
         observation = ModelObservation(**input)
         observation.save()
         return CreateObservation(observation=observation)
@@ -76,9 +99,8 @@ class UpdateObservation(graphene.Mutation):
 
     def mutate(self, info, input):
         id_ = input.pop("id")
-        # PatientNode:5e994f1b85c72524e35a5db2
+        # ObservationNode:5e994f1b85c72524e35a5db2
         id_ = base64_decode(id_)[16:]
-        print(id_)
         print("---更新的id为:", id_)
         observation = ModelObservation.objects.get(id=id_)
         observation.update(**input)

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from mongoengine import Document
-from mongoengine import StringField, IntField, DictField, DateTimeField, ReferenceField, DecimalField
+from mongoengine import StringField, DateTimeField, DecimalField
 
 from .observationcode import obs_code
 from mongoengine import EmbeddedDocumentField, EmbeddedDocument

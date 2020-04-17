@@ -13,13 +13,24 @@ from odk.database.base import connect # 必要,不知道为啥
 class Query(graphene.ObjectType):
 
     node = graphene.relay.Node.Field()
+
     users = MongoengineConnectionField(schema_user.UserNode)
+
     diabetes = MongoengineConnectionField(schema_diabetes.DiabetesNode)
+
     ocr = MongoengineConnectionField(schema_ocr.OcrNode)
+
     patient = MongoengineConnectionField(schema_patient.PatientNode)
+
     encounter = MongoengineConnectionField(schema_encounter.EncounterNode)
-    encounterclass = MongoengineConnectionField(schema_encounter.ClassNode)
+    encounter_class = MongoengineConnectionField(schema_encounter.ClassNode)
+
     observation = MongoengineConnectionField(schema_observation.ObservationNode)
+    observation_subject = MongoengineConnectionField(schema_observation.ObservationSubjectNode)
+    observation_encounter = MongoengineConnectionField(schema_observation.ObservationNode)
+    observation_code = MongoengineConnectionField(schema_observation.ObservationCodeNode)
+    observation_value_quantity = MongoengineConnectionField(schema_observation.ObservationValueQuantityNode)
+
 
 class Mutation(graphene.ObjectType):
     create_user = schema_user.CreateUser.Field()
