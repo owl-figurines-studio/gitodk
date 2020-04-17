@@ -1,5 +1,10 @@
 from mongoengine import Document
 from mongoengine import StringField, DictField, ListField
+from mongoengine import EmbeddedDocumentField, EmbeddedDocument
+
+
+class ClassModel(EmbeddedDocument):
+    code = StringField()
 
 
 class ModelEncounter(Document):
@@ -7,5 +12,5 @@ class ModelEncounter(Document):
 
     resourceType = StringField(required=True, default="encounter")
 
-    class_model = DictField(code=StringField(required=True))
+    classmodel = EmbeddedDocumentField(ClassModel)
 
