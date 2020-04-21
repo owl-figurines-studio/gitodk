@@ -141,49 +141,6 @@ def verify_ok():
     return response_data(1001)
 
 
-@api.route('/user/fhir')
-def fhir():
-    import fhirclient.models.patient as p
-    import fhirclient.models.humanname as hn
-    patient = p.Patient({'id': 'patient-1'})
-    print(patient.id)
-
-    name = hn.HumanName()
-    name.given = ['Peter']
-    name.family = 'Parker'
-    patient.name = [name]
-
-    print(mongodb)
-
-    print(patient.as_json())
-    dict01 = patient.as_json()
-    ret = mongodb.a.insert_one(dict01)
-    print(ret)
-    ret = mongodb.a.find()
-    for i in ret:
-        print(i)
-    print('111111111111111111')
-
-    import json
-    import fhirclient.models.patient as p
-    with open('/home/python/Desktop/odk/patient-example.json', 'r') as h:
-        pjs = json.load(h)
-    patient = p.Patient(pjs)
-    dict02 = patient.as_json()
-
-    ret = mongodb.a.insert_one(dict02)
-    print(ret)
-    ret = mongodb.a.find()
-    for i in ret:
-        print(i)
-    print('2222222222222222')
-    print(patient.name[0].given)
-    print(patient.name)
-    print(patient.gender)
-    print(patient.photo)
-    print(patient.address)
-    print("-------------------------")
-    return response_data(1000)
 
 # 短信登录,不需要了
 # @api.route('/user/login', methods=['POST'])
