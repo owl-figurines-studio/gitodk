@@ -8,6 +8,7 @@ import fhirclient.models.address as ad
 from . import api
 from odk.utils.Returns import response_data
 from odk import mongodb
+from odk.database.model_patient import ModelPatient
 
 
 @api.route('/patient', methods=['GET', 'POST', 'DELETE', 'PUT'])
@@ -16,15 +17,8 @@ def patient():
     user = get_jwt_identity()
     print("user:", user)
 
-    # with open('/home/python/Desktop/odk/patient-example.json', 'r') as h:
-    #     pjs = json.load(h)
-    # patient = p.Patient(pjs)
-    # print(patient)
-    # print(patient.as_json())
-
     if user is None:
         return response_data(2004, 403, '访问被禁止')
-        # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2004,'message':'没有登录'}},401
     # user = 19957892910
     patient_list = mongodb.basic_information.find({'id': str(user)})
     print(patient_list)

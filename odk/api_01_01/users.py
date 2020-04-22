@@ -5,7 +5,7 @@ from flask import request, make_response
 from flask_jwt_extended import create_access_token, jwt_required
 
 from . import api
-from odk import redis_verify, mongodb
+from odk import redis_verify
 from odk.libs.yuntongxun.sms import CCP
 from odk.utils.Returns import response_data
 from odk.utils.check import check_form_key
@@ -34,7 +34,7 @@ def test_test():
 @api.route('/user/code2session', methods=['POST'])
 def wechat_login():
     """
-    微信登录,获取token
+    微信登录,获取token,登录的时候需要添加Bearer
     request.form = {
         "code": "043sT4oa1CKHuM1LkVpa1ns4oa1sT4oE"
     }
@@ -141,46 +141,37 @@ def verify_ok():
     return response_data(1001)
 
 
-
 # 短信登录,不需要了
-# @api.route('/user/login', methods=['POST'])
-# def login():
-#     """
-#     登录
-#     request.form = {
-#         "userphone" = "11122223333"
-#         "verification_code" = "
-#     }
-#     :return:
-#     """
-#     try:# 获取手机号和验证码
-#         qian_vercode=request.form['verification_code']
-#         qian_userphone = request.form['userphone']
-#         get_redis_verify = verify_rs.get(qian_userphone)
-#     except:
-#         print('前端输入错误')
-#         return response_data(2003, 403, '访问被禁止')
-#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
-#     # 判断验证码是不是正确
-#     if qian_vercode != get_redis_verify:
-#         return response_data(2003, 403, '访问被禁止')
-#         # return {'code':403,'message':'访问被禁止','data':{'verifyStateCode':2003,'message':'验证码错误'}},403
-#     # 从数据库中查找用户
-#     user_lst=User.query.filter_by(user_phone=qian_userphone).all()
-#     # 查找结果为空,则新建
-#     print(user_lst)
-#     if user_lst == []:
-#         print('新创建一个user')
-#         obj = User(user_phone=qian_userphone)
-#         db.session.add(obj)
-#         db.session.commit()
-#     else:
-#         print('已有user,不操作')
-#     # 新建jwt,并返回个前端
-#     access_token = create_access_token(identity=qian_userphone)
-#     ret,state = response_data(1007)
-#     response = make_response(ret)
-#     response.headers['token'] = access_token
-#     response.state = state
-#
-#     return response
+@api.route('/user/login', methods=['POST'])
+def login():
+    """
+    登录
+    request.form = {
+        "userphone" = "11122223333"
+        "verification_code" = "12346"
+    }
+    :return:
+    """
+    must_keys = ['verification_code', 'userphone']
+    form_data = request.form.to_dict()
+    errmsg = check_form_key(form_data, must_keys)
+    if errmsg:
+        return response_data(2016, errmsg=errmsg)
+    # 获取手机号和验证码
+    qian_vercode = form_data['verification_code']
+    qian_userphone = form_data['userphone']
+    get_redis_verify = redis_verify.get(qian_userphone)
+    print("---get_redis_verify:", get_redis_verify)
+
+    # 判断验证码是不是正确
+    if qian_vercode != get_redis_verify:
+        return response_data(2003, 403, '访问被禁止')
+
+    # 新建jwt,并返回个前端
+    access_token = create_access_token(identity=qian_userphone)
+    ret, state = response_data(1007)
+    response = make_response(ret)
+    response.headers['token'] = access_token
+    response.state = state
+
+    return response
