@@ -15,6 +15,7 @@ class PatientAttribute:
     birthDate = graphene.String()
     gender = graphene.String()
     name = graphene.List(graphene.String)
+    telecom = graphene.String()
 
     # code = SubInput()
     # code = graphene.List(SubInput)
@@ -73,4 +74,5 @@ class UpdatePatient(graphene.Mutation):
         patient = ModelPatient.objects.get(id=id_)
         patient.update(**input)
         patient.save()
+        patient = ModelPatient.objects.get(id=id_)
         return UpdatePatient(patient=patient)

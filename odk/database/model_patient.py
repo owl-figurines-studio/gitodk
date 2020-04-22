@@ -14,3 +14,5 @@ class ModelPatient(Document):
     birthDate = StringField()
 
     name = ListField(StringField())
+
+    telecom = StringField()
