@@ -88,9 +88,20 @@ def get_best_model(pima):
         avg_results[name] = mean_ret
 
     # 打印全部结果,平均值结果,平均值最好的结果
+    import matplotlib.pyplot as plt
     print("all_result: ---")
+    x_data = [i for i in range(1,11)]
+    color = ['red','blue','green','gray','black']
+    i = 0
     for name, result in all_results.items():
         print("---", name, ":", result)
+        # plt.plot(x_data, result, color=color[i], linestyle='-.',label=name)
+        # i += 1
+    # plt.legend()
+    # plt.show()
+
+    from sklearn.model_selection import GridSearchCV
+
 
     print("avg_result: ===")
     for name, result in avg_results.items():
@@ -101,37 +112,99 @@ def get_best_model(pima):
         print("+++", name, ":", result)
 
     # 重新进行分割
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.25, random_state=5)
+    # x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.25, random_state=5)
     # 将最好的算法进行训练和预测
-    best_classifier = models[best_result["name"]]()
-    best_classifier.fit(x_train, y_train)
-    y_predict = best_classifier.predict(x_test)
+    best_classifier_name = models[best_result["name"]]
+    best_classifier_name = LogisticRegression
+    print(best_classifier_name)
+    best_classifier = best_classifier_name()
+    param_grid = dict()
+    if best_classifier_name is LogisticRegression:
+        print("---LogisticRegression")
+        param_grid = {'C': range(1, 100), "solver": ['newton-cg', 'lbfgs', 'liblinear', 'sag']}
+    elif best_classifier_name is GaussianNB:
+        param_grid = {'var_smoothing': [1e-8,1e-9,1e-10]}
+        print("---GaussianNB")
+    elif best_classifier_name is KNeighborsClassifier:
+        print("---KNeighborsClassifier")
+        param_grid = {"n_neighbors": range(3, 10, 2),
+                      "weights": ['uniform', 'distance'],
+                      "algorithm": ['auto', 'ball_tree', 'kd_tree', 'brute'],
+                      "leaf_size": range(10,100,10),
+                      "p": range(1,10)}
 
+        diabetes = pima
+        x_train, x_test, y_train, y_test = train_test_split(diabetes.loc[:, diabetes.columns != 'Outcome'],
+                                                            diabetes['Outcome'],
+                                                            stratify=diabetes['Outcome'], random_state=66)
+
+        training_accuracy = []
+        test_accuracy = []
+        # try n_neighbors from 1 to 10
+        neighbors_settings = range(1, 11)
+
+        for n_neighbors in neighbors_settings:
+            # build the model
+            knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+            knn.fit(x_train, y_train)
+            # record training set accuracy
+            training_accuracy.append(knn.score(x_train, y_train))
+            # record test set accuracy
+            test_accuracy.append(knn.score(x_test, y_test))
+        plt.plot(neighbors_settings, training_accuracy, label="training accuracy")
+        plt.plot(neighbors_settings, test_accuracy, label="test accuracy")
+        plt.ylabel("Accuracy")
+        plt.xlabel("n_neighbors")
+        plt.legend()
+        plt.savefig('knn_compare_model')
+        plt.show()
+    elif best_classifier_name is DecisionTreeClassifier:
+        print("---DecisionTreeClassifier")
+        param_grid = {"criterion": ["gini", "entropy"]}
+    elif best_classifier_name is SVC:
+        param_grid = {'C': [0.1,0.5,1,5,10,100],
+                      "kernel":['linear', 'poly', 'rbf', 'sigmoid']}
+        print("---SVC")
+
+    best_classifier_gcv = GridSearchCV(best_classifier, param_grid, refit=True, verbose=2, scoring='roc_auc',n_jobs=-1)
+    best_classifier_gcv.fit(X_train, Y_train)
+
+    print("---best_params:", best_classifier_gcv.best_params_)
+    # print("---得到的最佳模型:", best_classifier_gcv.estimator)
+    print("---score:", best_classifier_gcv.best_score_)
+    # 预测
+    y_predict = best_classifier_gcv.predict(X_test)
+
+    # 分类报告
+    print(classification_report(Y_test, y_predict))
+    # best_classifier.fit(x_train, y_train)
+    # y_predict = best_classifier.predict(x_test)
+    from sklearn import metrics
     # 画出ROC曲线
-    # fpr, tpr, threshold = metrics.roc_curve(y_test, y_predict)
-    # roc_auc = metrics.auc(fpr, tpr)
-    # plt.figure(figsize=(6, 6))
-    # plt.title('Validation ROC')
-    # plt.plot(fpr, tpr, 'b', label='Val AUC = %0.3f' % roc_auc)
-    # plt.legend(loc='lower right')
-    # plt.plot([0, 1], [0, 1], 'r--')
-    # plt.xlim([0, 1])
-    # plt.ylim([0, 1])
-    # plt.ylabel('True Positive Rate')
-    # plt.xlabel('False Positive Rate')
-    # plt.show()
+    fpr, tpr, threshold = metrics.roc_curve(Y_test, y_predict)
+    roc_auc = metrics.auc(fpr, tpr)
+    plt.figure(figsize=(6, 6))
+    plt.title('Validation ROC')
+    plt.plot(fpr, tpr, 'b', label='Val AUC = %0.3f' % roc_auc)
+    plt.legend(loc='lower right')
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.show()
 
 
-    cm = confusion_matrix(y_test, y_predict)  # 得到混淆矩阵
+    # cm = confusion_matrix(Y_test, y_predict)  # 得到混淆矩阵
     # print(cm)
     # label = ["1","0"]
-    # 画出混淆矩阵的热力图
+    # # 画出混淆矩阵的热力图
     # sns.heatmap(cm, annot = True,  fmt='.20g', xticklabels=label, yticklabels=label)
     # plt.show()
 
-    cr = classification_report(y_test,y_predict)
-    print("检测报告为:")
-    print(cr)  # 打印模型的检测报告
+    # cr = classification_report(y_test,y_predict)
+    # print("检测报告为:")
+    # print(cr)  # 打印模型的检测报告
 
     # 导出较好的特征
     with open("models/columns", 'w') as f:
@@ -143,9 +216,9 @@ def get_best_model(pima):
 
     # 导出训练好的模型
     with open("models/diabetes_base.model", 'wb') as file:
-        pickle.dump(best_classifier, file)
+        pickle.dump(best_classifier_gcv, file)
 
-    return std, best_classifier
+    return std, best_classifier_gcv
 
 
 if __name__ == '__main__':
@@ -160,7 +233,7 @@ if __name__ == '__main__':
     std, best_classifier = get_best_model(pima)
     data_in = [[148, 0, 33.6, 50]]
     data_in_tr = std.transform(data_in)
-    print(data_in_tr)
+    # print(data_in_tr)
     ret = best_classifier.predict(data_in_tr)
     print(ret)
 

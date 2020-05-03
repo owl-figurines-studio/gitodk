@@ -14,3 +14,4 @@ class ModelEncounter(Document):
 
     classmodel = EmbeddedDocumentField(ClassModel)
 
+    period = StringField()

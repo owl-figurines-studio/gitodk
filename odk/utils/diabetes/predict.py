@@ -6,7 +6,7 @@ import pickle
 def predict(dic, pwd=None):
     # pwd :代表odk的路径
     if pwd is None:
-        pwd = os.getcwd()+"/utils/diabetes/models/"
+        pwd = os.getcwd()+"/odk/utils/diabetes/models/"
         print(pwd)
     with open(pwd+"diabetes_base.model", 'rb') as file:
        model = pickle.load(file)

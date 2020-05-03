@@ -11,6 +11,7 @@ class ClassAttribute(graphene.InputObjectType):
 
 class EncounterAttribute:
     classmodel = ClassAttribute()
+    period = graphene.String()
     pass
 
 

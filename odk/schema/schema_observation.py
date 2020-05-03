@@ -102,7 +102,15 @@ class UpdateObservation(graphene.Mutation):
         # ObservationNode:5e994f1b85c72524e35a5db2
         id_ = base64_decode(id_)[16:]
         print("---更新的id为:", id_)
+        print("---input:", input)
         observation = ModelObservation.objects.get(id=id_)
+        if "valueQuantity" in input.keys():
+            obs_value = observation.valueQuantity
+            xxx = {"value": obs_value.value,"unit":obs_value.unit,"code":obs_value.code}
+            xxx.update(input["valueQuantity"])
+            input["valueQuantity"] = xxx
+            print("--- valueQuantity update input", input)
         observation.update(**input)
         observation.save()
+        observation = ModelObservation.objects.get(id=id_)
         return UpdateObservation(observation=observation)

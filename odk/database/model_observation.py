@@ -20,7 +20,8 @@ class ObservationEncounter(EmbeddedDocument):
 
 
 class ObservationCode(EmbeddedDocument):
-    text = StringField(choices=obs_code.keys())
+    # text = StringField(choices=obs_code.keys())
+    text = StringField()
 
 
 class ObservationValueQuantity(EmbeddedDocument):
